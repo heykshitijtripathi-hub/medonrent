@@ -11,7 +11,6 @@ import {
   Activity, 
   CheckCircle2,
   Package,
-  Building2,
   Menu,
   X
 } from 'lucide-react';
@@ -22,7 +21,6 @@ interface NavbarProps {
   onOpenListingWizard: () => void;
   onOpenEscrowSimulator: () => void;
   onOpenMyRentals: () => void;
-  onOpenLenderHub: () => void;
   onOpenQuery: () => void;
   activeBookingsCount: number;
   searchQuery: string;
@@ -46,7 +44,6 @@ export default function Navbar({
   onOpenListingWizard,
   onOpenEscrowSimulator,
   onOpenMyRentals,
-  onOpenLenderHub,
   onOpenQuery,
   activeBookingsCount,
   searchQuery,
@@ -193,16 +190,6 @@ export default function Navbar({
             )}
           </button>
 
-          {/* Owner Dashboard (Earnings & Listings) */}
-          <button
-            onClick={onOpenLenderHub}
-            className="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center space-x-1 sm:space-x-1.5 transition-colors"
-          >
-            <Building2 className="w-4 h-4 text-emerald-700" />
-            <span className="hidden sm:inline">Owner Earnings</span>
-            <span className="sm:hidden">Earnings</span>
-          </button>
-
           {/* List Equipment */}
           <button
             onClick={onOpenListingWizard}
@@ -281,19 +268,6 @@ export default function Navbar({
 
           {/* Quick Hub Links */}
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-            <button
-              onClick={() => {
-                onOpenLenderHub();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold"
-            >
-              <div className="flex items-center space-x-2">
-                <Building2 className="w-4 h-4 text-[#007791]" />
-                <span>Lender Hub (Owner Dashboard)</span>
-              </div>
-              <span className="text-slate-400">→</span>
-            </button>
 
             <button
               onClick={() => {

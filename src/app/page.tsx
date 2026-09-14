@@ -8,7 +8,6 @@ import EquipmentGrid from '@/components/EquipmentGrid';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import CheckoutModal, { CompletedBooking } from '@/components/CheckoutModal';
 import MyRentalsModal from '@/components/MyRentalsModal';
-import LenderHubModal from '@/components/LenderHubModal';
 import ListingWizardModal from '@/components/ListingWizardModal';
 import EscrowSimulatorModal from '@/components/EscrowSimulatorModal';
 import PrescriptionUploadModal from '@/components/PrescriptionUploadModal';
@@ -101,7 +100,6 @@ export default function HomePage() {
   const [checkoutProduct, setCheckoutProduct] = useState<EquipmentItem | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [isMyRentalsOpen, setIsMyRentalsOpen] = useState<boolean>(false);
-  const [isLenderHubOpen, setIsLenderHubOpen] = useState<boolean>(false);
   const [isListingWizardOpen, setIsListingWizardOpen] = useState<boolean>(false);
   const [isEscrowSimulatorOpen, setIsEscrowSimulatorOpen] = useState<boolean>(false);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState<boolean>(false);
@@ -298,16 +296,6 @@ export default function HomePage() {
     setTimeout(() => setRecentBookingToast(null), 7000);
   };
 
-  const handleToggleListing = (listingId: string) => {
-    setEquipmentList((prev) =>
-      prev.map((item) => {
-        if (item.id === listingId) {
-          return { ...item, isAvailable: !item.isAvailable };
-        }
-        return item;
-      })
-    );
-  };
 
   const scrollToCatalog = () => {
     const el = document.getElementById('catalog-section');
@@ -344,7 +332,6 @@ export default function HomePage() {
         onOpenListingWizard={() => setIsListingWizardOpen(true)}
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenMyRentals={() => setIsMyRentalsOpen(true)}
-        onOpenLenderHub={() => setIsLenderHubOpen(true)}
         onOpenQuery={() => setIsQueryModalOpen(true)}
         activeBookingsCount={userBookings.filter((b) => b.orderStatus !== 'COMPLETED_REFUNDED').length}
         searchQuery={searchQuery}
@@ -433,15 +420,6 @@ export default function HomePage() {
         bookings={userBookings}
         onExtendBooking={handleExtendBooking}
         onReturnBooking={handleReturnBooking}
-      />
-
-      {/* Lender Hub Modal */}
-      <LenderHubModal
-        isOpen={isLenderHubOpen}
-        onClose={() => setIsLenderHubOpen(false)}
-        myListings={equipmentList.slice(0, 3)}
-        onToggleListingStatus={handleToggleListing}
-        onOpenNewListing={() => setIsListingWizardOpen(true)}
       />
 
       {/* Listing Wizard Modal */}
