@@ -109,7 +109,7 @@ export default function Navbar({
               </span>
             </div>
             <p className="text-[11px] text-slate-500 font-medium hidden md:block">
-              Peer-to-Peer Medical Equipment Rental Marketplace
+              Verified Medical Equipment on Rent • Doorstep Delivery
             </p>
           </div>
         </div>

@@ -108,9 +108,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-cyan-50 text-[#007791] flex items-center justify-center font-black text-sm mb-4">
                 2
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Smart Rent & Deposit</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Fair Pricing & Full Deposit</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Our algorithm sets optimal rental yield and locks 18–25% equipment replacement deposit so your asset is 100% insured.
+                Choose our recommended rental rates or set your own. A security deposit is collected and held in escrow to keep your equipment safe.
               </p>
             </div>
 
@@ -118,9 +118,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-cyan-50 text-[#007791] flex items-center justify-center font-black text-sm mb-4">
                 3
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Zero-Hassle Pickup</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Doorstep Pickup via Porter</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                You never leave your home. Porter picks up the sanitized machine from your doorstep using a secure one-time passcode.
+                You never need to travel. Porter collects the equipment directly from your home using a secure one-time passcode (OTP).
               </p>
             </div>
 
@@ -128,9 +128,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#059669] flex items-center justify-center font-black text-sm mb-4">
                 4
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">82% Automated Payout</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Direct Monthly Earnings</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Earn ₹4,000–₹8,000/month in passive income. Payout is wired directly to your verified bank account via automated gateway split.
+                Receive rental income directly into your bank account while helping a patient in your city complete their recovery.
               </p>
             </div>
           </div>

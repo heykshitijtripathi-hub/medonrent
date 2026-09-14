@@ -37,15 +37,15 @@ export default function Hero({
         <div className="flex flex-wrap items-center gap-2 mb-6">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-xs text-slate-300 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-[#10B981]"></span>
-            <span>Asset-Light P2P Medical Marketplace</span>
+            <span>Verified Patient & Doctor Community</span>
           </div>
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-xs text-cyan-300">
             <Lock className="w-3 h-3 text-cyan-400" />
-            <span>Escrow Guarantee: Zero Deposit Risk</span>
+            <span>100% Refundable Security Deposit</span>
           </div>
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-950/50 border border-emerald-800/60 text-xs text-emerald-300">
             <Truck className="w-3 h-3 text-emerald-400" />
-            <span>Doorstep Porter Dispatch in {selectedCity}</span>
+            <span>Doorstep Porter Delivery in {selectedCity}</span>
           </div>
         </div>
 
@@ -58,7 +58,7 @@ export default function Hero({
             </span>
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-slate-300 font-normal leading-relaxed mb-6 sm:mb-8">
-            Connect directly with verified families holding post-recovery oxygen concentrators, motorized ICU beds, and electric wheelchairs. Save 75% on patient recovery while earning 82% rental income from idle medical gear.
+            Rent hospital-sanitized oxygen concentrators, motorized ICU beds, and electric wheelchairs directly from verified families nearby. Get genuine medical equipment delivered in under 90 minutes with zero deposit risk.
           </p>
         </div>
 

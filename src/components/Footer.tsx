@@ -113,41 +113,45 @@ export default function Footer() {
           {/* Col 4: Trust, Safety & Support */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-3">
-              Caregiver Support 24/7
+              Caregiver Support & Grievance
             </h4>
             <div className="space-y-2.5">
               <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs">
-                <div className="text-slate-400 text-[11px]">Emergency Patient Line:</div>
+                <div className="text-slate-400 text-[11px]">Toll-Free Patient Helpline:</div>
                 <a href="tel:18001209988" className="text-emerald-400 font-bold text-sm block mt-0.5 hover:underline">
-                  1800-120-RENT (Toll Free)
+                  1800-120-RENT (9:00 AM – 9:00 PM)
                 </a>
               </div>
-              <div className="flex items-center space-x-2 text-slate-400">
+              <div className="flex items-center space-x-2 text-slate-300">
                 <Mail className="w-3.5 h-3.5 text-[#007791]" />
-                <span>care@medonrent.in</span>
+                <a href="mailto:care@medonrent.in" className="hover:underline">care@medonrent.in</a>
               </div>
-              <div className="flex items-center space-x-2 text-slate-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>UIDAI Aadhaar Verified Intermediary</span>
+              <div className="flex items-start space-x-2 text-slate-400 text-[11px]">
+                <MapPin className="w-3.5 h-3.5 text-[#007791] mt-0.5 shrink-0" />
+                <span>MedOnRent Hub: Sector 44, Institutional Area, Gurugram, Haryana - 122003</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-400 text-[11px]">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>UIDAI Aadhaar Verified Peer Verification</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Regulatory & Medical Intermediary Disclaimer */}
-        <div className="pt-8 text-[11px] text-slate-500 leading-relaxed space-y-2">
+        <div className="pt-8 text-[11px] text-slate-400 leading-relaxed space-y-2.5">
           <p>
-            <strong className="text-slate-400">Medical Device Intermediary Disclaimer:</strong> MedOnRent operates strictly as a digital technology intermediary platform under Section 79 of the Information Technology Act, 2000. MedOnRent does not manufacture, diagnose, or provide clinical medical advice. All life-support and respiratory medical devices must be utilized strictly under the supervision and prescription of a registered medical practitioner.
+            <strong className="text-slate-300">Medical Device Intermediary Notice:</strong> MedOnRent operates as an online peer-to-peer sharing and rental platform under Section 79 of the Information Technology Act, 2000. MedOnRent connects individuals seeking temporary medical gear with owners of idle equipment. MedOnRent is not a hospital, medical practitioner, or manufacturer. All life-support and respiratory medical equipment should only be operated following instructions provided by your attending doctor or hospital discharge summary.
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-slate-800/60 text-slate-500">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-800/60 text-slate-400">
             <div>
-              © 2026 MedOnRent Technologies India Pvt. Ltd. All rights reserved.
+              © 2026 MedOnRent Technologies Private Limited. All rights reserved. Registered under MCA (Govt. of India).
             </div>
-            <div className="flex items-center space-x-4">
-              <a href="#" className="hover:text-slate-300">Privacy Policy</a>
-              <a href="#" className="hover:text-slate-300">Escrow Terms</a>
-              <a href="#" className="hover:text-slate-300">Hygiene Protocol</a>
-              <a href="#" className="hover:text-slate-300">CDSCO Compliance</a>
+            <div className="flex flex-wrap items-center gap-4 text-[11px]">
+              <a href="#" className="hover:text-slate-200">Terms of Service</a>
+              <a href="#" className="hover:text-slate-200">Security Deposit Policy</a>
+              <a href="#" className="hover:text-slate-200">Hygiene & Sterilization Standards</a>
+              <a href="#" className="hover:text-slate-200">Grievance Officer</a>
             </div>
           </div>
         </div>
