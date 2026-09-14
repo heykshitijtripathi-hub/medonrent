@@ -19,6 +19,8 @@ import FaqSection from '@/components/FaqSection';
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 import Footer from '@/components/Footer';
 import QueryModal from '@/components/QueryModal';
+import GoogleAuthModal from '@/components/GoogleAuthModal';
+import { AuthProvider } from '@/context/AuthContext';
 import { INITIAL_EQUIPMENT, EquipmentItem } from '@/data/initialEquipment';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -303,7 +305,8 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <AuthProvider>
+      <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       {/* Toast Notification */}
       {recentBookingToast && (
         <div className="fixed bottom-6 right-6 z-50 max-w-sm p-4 bg-[#0B192C] text-white rounded-2xl shadow-2xl border border-cyan-500/40 animate-in slide-in-from-bottom-5 duration-300">
@@ -451,6 +454,9 @@ export default function HomePage() {
         onClose={() => setIsQueryModalOpen(false)}
       />
 
+      {/* Google Authentication Modal */}
+      <GoogleAuthModal />
+
       {/* Floating WhatsApp Support */}
       <WhatsAppFloatingButton
         onOpenPrescription={() => setIsPrescriptionModalOpen(true)}
@@ -459,5 +465,6 @@ export default function HomePage() {
       {/* Footer */}
       <Footer />
     </div>
-  );
+  </AuthProvider>
+);
 }

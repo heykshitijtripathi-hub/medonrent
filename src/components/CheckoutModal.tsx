@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
 import { 
   X, 
   Lock, 
@@ -61,10 +62,11 @@ export default function CheckoutModal({
   onClose,
   onBookingComplete,
 }: CheckoutModalProps) {
+  const { user, openAuthModal } = useAuth();
   const [step, setStep] = useState<'details' | 'payment' | 'processing' | 'receipt'>('details');
 
   // Step 1 Form
-  const [patientName, setPatientName] = useState('Anil Kumar');
+  const [patientName, setPatientName] = useState(user?.name || 'Anil Kumar');
   const [patientPhone, setPatientPhone] = useState('+91 98102 34567');
   const [deliveryAddress, setDeliveryAddress] = useState('Flat 402, Tower B, Palm Springs, Sector 54');
   const [pincode, setPincode] = useState('122002');
@@ -228,6 +230,41 @@ export default function CheckoutModal({
                   <span>Patient & Delivery Address</span>
                   <span className="text-[10px] text-[#007791] font-normal">Porter doorstep handover</span>
                 </div>
+
+                {user ? (
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-cyan-50/70 border border-cyan-200 text-xs">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 rounded-full bg-[#007791] text-white flex items-center justify-center font-bold text-[10px]">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-800">Signed in as {user.name}</span>
+                        <span className="text-slate-500 text-[10px] block">{user.email}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPatientName(user.name)}
+                      className="text-[11px] font-bold text-[#007791] hover:underline"
+                    >
+                      Use Profile Name
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openAuthModal}
+                    className="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0">
+                      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z" />
+                      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z" />
+                      <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" />
+                      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+                    </svg>
+                    <span>Sign in with Google to auto-fill</span>
+                  </button>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>

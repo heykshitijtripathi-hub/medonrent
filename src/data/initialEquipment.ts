@@ -55,7 +55,7 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
       "Weight": "14 kg (Smooth caster wheels)",
       "Power": "350W power consumption"
     },
-    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
+    image: "/equipment/oxygen-concentrator.jpg",
     videoDurationSec: 5,
     hasWorkingProofVideo: true,
     isSanitized: true,
@@ -101,7 +101,7 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
       "Dimensions": "2150 mm x 1000 mm",
       "Safety Rails": "Fold-down locking aluminum"
     },
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80",
+    image: "/equipment/icu-bed.jpg",
     videoDurationSec: 5,
     hasWorkingProofVideo: true,
     isSanitized: true,
@@ -147,7 +147,7 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
       "Data": "SD Card sleep report ready",
       "Weight": "1.2 kg (Travel friendly)"
     },
-    image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80",
+    image: "/equipment/cpap-machine.jpg",
     videoDurationSec: 5,
     hasWorkingProofVideo: true,
     isSanitized: true,
@@ -193,7 +193,7 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
       "Turning Radius": "Tight 75 cm for flat hallways",
       "Brakes": "Electromagnetic auto-stop"
     },
-    image: "https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=800&q=80",
+    image: "/equipment/electric-wheelchair.jpg",
     videoDurationSec: 5,
     hasWorkingProofVideo: true,
     isSanitized: true,
@@ -238,7 +238,7 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
       "Material": "Medical-grade non-toxic PVC",
       "Weight Limit": "135 kg capacity"
     },
-    image: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&w=800&q=80",
+    image: "/equipment/air-mattress.jpg",
     videoDurationSec: 5,
     hasWorkingProofVideo: true,
     isSanitized: true,
@@ -283,7 +283,7 @@ export const INITIAL_EQUIPMENT: EquipmentItem[] = [
       "Weight": "6.8 kg total weight",
       "Brakes": "Dual squeeze and push-down lock"
     },
-    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80",
+    image: "/equipment/rollator-walker.jpg",
     videoDurationSec: 5,
     hasWorkingProofVideo: true,
     isSanitized: true,
