@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
+import LocationModal from '@/components/LocationModal';
+import ExploreCategories from '@/components/ExploreCategories';
 import CategoryFilter from '@/components/CategoryFilter';
 import EquipmentGrid from '@/components/EquipmentGrid';
 import ProductDetailModal from '@/components/ProductDetailModal';
@@ -106,6 +108,24 @@ export default function HomePage() {
   const [isEscrowSimulatorOpen, setIsEscrowSimulatorOpen] = useState<boolean>(false);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState<boolean>(false);
   const [isQueryModalOpen, setIsQueryModalOpen] = useState<boolean>(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState<boolean>(false);
+
+  // Initial location chooser (RentoMojo first-visit algorithm)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mor_selected_city');
+      if (saved) {
+        setSelectedCity(saved);
+      } else {
+        const timer = setTimeout(() => {
+          setIsLocationModalOpen(true);
+        }, 700);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Toast
   const [recentBookingToast, setRecentBookingToast] = useState<ToastState | null>(null);
@@ -331,7 +351,7 @@ export default function HomePage() {
       {/* Main Navbar */}
       <Navbar
         selectedCity={selectedCity}
-        onSelectCity={setSelectedCity}
+        onOpenLocationModal={() => setIsLocationModalOpen(true)}
         onOpenListingWizard={() => setIsListingWizardOpen(true)}
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenMyRentals={() => setIsMyRentalsOpen(true)}
@@ -350,7 +370,13 @@ export default function HomePage() {
       />
 
       {/* Main Discovery Container */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* RentoMojo-style Visual Top Categories Showcase */}
+        <ExploreCategories
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          onOpenPrescription={() => setIsPrescriptionModalOpen(true)}
+        />
         {/* Category & Quick Filter Bar with Location Tracker */}
         <CategoryFilter
           selectedCategory={selectedCategory}
@@ -456,6 +482,15 @@ export default function HomePage() {
 
       {/* Google Authentication Modal */}
       <GoogleAuthModal />
+
+      {/* RentoMojo-style Location Modal */}
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        selectedCity={selectedCity}
+        onSelectCity={setSelectedCity}
+        onFetchGPS={handleToggleNearMe}
+      />
 
       {/* Floating WhatsApp Support */}
       <WhatsAppFloatingButton
