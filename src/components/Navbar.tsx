@@ -193,13 +193,14 @@ export default function Navbar({
             )}
           </button>
 
-          {/* Lender Portal Hub (Desktop) */}
+          {/* Owner Dashboard (Earnings & Listings) */}
           <button
             onClick={onOpenLenderHub}
-            className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center space-x-1.5 transition-colors hidden lg:flex"
+            className="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center space-x-1 sm:space-x-1.5 transition-colors"
           >
-            <Building2 className="w-4 h-4 text-slate-500" />
-            <span>Lender Hub</span>
+            <Building2 className="w-4 h-4 text-emerald-700" />
+            <span className="hidden sm:inline">Owner Earnings</span>
+            <span className="sm:hidden">Earnings</span>
           </button>
 
           {/* List Equipment */}
