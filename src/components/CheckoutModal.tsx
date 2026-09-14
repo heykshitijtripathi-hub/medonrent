@@ -149,28 +149,28 @@ export default function CheckoutModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-slate-900/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 overflow-y-auto bg-slate-900/80 backdrop-blur-sm">
+      <div className="relative w-full max-w-2xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[96vh] sm:max-h-[92vh]">
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-[#0B192C] text-white flex items-center justify-between">
-          <div className="flex items-center space-x-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#0B192C] text-white flex items-center justify-between">
+          <div className="flex items-center space-x-2 sm:space-x-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] flex-shrink-0"></span>
             <div>
-              <h3 className="text-sm font-bold text-white">
-                {step === 'details' && 'Step 1: Patient Delivery & Rental Duration'}
-                {step === 'payment' && 'Step 2: Secure Payment & Escrow Lock'}
+              <h3 className="text-xs sm:text-sm font-bold text-white">
+                {step === 'details' && 'Step 1: Patient Delivery & Duration'}
+                {step === 'payment' && 'Step 2: Secure Payment & Escrow'}
                 {step === 'processing' && 'Processing Transaction...'}
                 {step === 'receipt' && 'Booking Confirmed & Digital Receipt'}
               </h3>
-              <p className="text-[11px] text-slate-300">
-                {step !== 'receipt' ? '100% Refundable Security Deposit • Direct Doorstep Delivery' : 'Receipt generated & SMS sent to patient'}
+              <p className="text-[10px] sm:text-[11px] text-slate-300 line-clamp-1">
+                {step !== 'receipt' ? '100% Refundable Deposit • Direct Doorstep Delivery' : 'Receipt generated & SMS sent'}
               </p>
             </div>
           </div>
           {step !== 'processing' && (
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center flex-shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
