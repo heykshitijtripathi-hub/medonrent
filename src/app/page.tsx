@@ -306,7 +306,7 @@ export default function HomePage() {
 
   return (
     <AuthProvider>
-      <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+      <div className="min-h-screen flex flex-col bg-[#F8FAFC] overflow-x-hidden w-full">
       {/* Toast Notification */}
       {recentBookingToast && (
         <div className="fixed bottom-6 right-6 z-50 max-w-sm p-4 bg-[#0B192C] text-white rounded-2xl shadow-2xl border border-cyan-500/40 animate-in slide-in-from-bottom-5 duration-300">
