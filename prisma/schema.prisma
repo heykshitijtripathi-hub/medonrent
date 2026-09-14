@@ -1,0 +1,247 @@
+// MedOnRent Database Schema
+// Database engine: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  RENTER
+  LENDER
+  ADMIN
+  HOSPITAL_COORDINATOR
+}
+
+enum EquipmentCategory {
+  RESPIRATORY
+  HOME_ICU
+  MOBILITY
+  MONITORING
+  INFUSION_DIALYSIS
+}
+
+enum BookingStatus {
+  AWAITING_PAYMENT
+  ESCROW_LOCKED
+  READY_FOR_PICKUP
+  DISPATCHED_PORTER
+  ACTIVE_IN_USE
+  EXTENSION_REQUESTED
+  RETURN_DISPATCHED
+  RETURNED_INSPECTION
+  COMPLETED_SETTLED
+  DISPUTE_OPEN
+}
+
+enum EscrowStatus {
+  NOT_INITIATED
+  HELD_IN_ESCROW
+  PARTIALLY_RELEASED
+  REFUNDED_TO_RENTER
+  RELEASED_TO_LENDER
+  PENALTY_DEDUCTED
+}
+
+enum DisputeReason {
+  ITEM_NOT_FUNCTIONAL
+  COSMETIC_DAMAGE
+  MISSING_ACCESSORIES
+  LATE_RETURN
+  WRONG_ITEM_DELIVERED
+}
+
+model User {
+  id                String          @id @default(cuid())
+  phoneNumber       String          @unique
+  fullName          String
+  email             String?         @unique
+  role              UserRole        @default(RENTER)
+  
+  // KYC & Trust
+  isKycVerified     Boolean         @default(false)
+  kycMethod         String?         // "AADHAAR_OTP" | "DIGILOCKER"
+  kycVerifiedAt     DateTime?
+  aadhaarMasked     String?         // e.g. "XXXX-XXXX-4921"
+  city              String          @default("Delhi NCR")
+  pincode           String?
+  addressLine       String?
+  
+  // Bank Account for Lenders
+  bankAccountNumber String?
+  bankIfsc          String?
+  bankBeneficiary   String?
+
+  // Ratings
+  averageRating     Float           @default(5.0)
+  totalReviews      Int             @default(0)
+
+  // Relations
+  listings          Listing[]
+  renterBookings    Booking[]       @relation("RenterBookings")
+  reviewsGiven      Review[]        @relation("ReviewsWritten")
+  reviewsReceived   Review[]        @relation("ReviewsReceived")
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model Listing {
+  id                  String            @id @default(cuid())
+  ownerId             String
+  owner               User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  title               String            // e.g., "Philips EverFlo 5L Oxygen Concentrator"
+  brand               String            // e.g., "Philips Respironics"
+  modelNumber         String?
+  category            EquipmentCategory
+  description         String
+  
+  // Pricing & Economics
+  originalRetailPrice Float             // Original purchase price (₹55,000)
+  monthlyRent         Float             // Suggested/set rent (₹6,000)
+  dailyRate           Float?            // For pro-rata extensions
+  securityDeposit     Float             // Depreciated escrow guarantee (₹10,000)
+  minimumTenureDays   Int               @default(15)
+  
+  // Verification & Hygiene
+  conditionVideoUrl   String            // 5-sec proof of working condition
+  photos              String[]          // High-res photo array
+  isSanitized         Boolean           @default(true)
+  sanitizationBadge   String?           // "HOSPITAL_GRADE_DISINFECTED"
+  lastSanitizedAt     DateTime          @default(now())
+  
+  // Specs JSON for category-specific medical metrics
+  // e.g., {"oxygenPurity": "93% +/- 3%", "flowRate": "5 L/min", "weightKg": 14}
+  technicalSpecs      Json?
+
+  // Location
+  pickupAddress       String
+  city                String            // "Delhi NCR", "Mumbai", "Bengaluru", etc.
+  pincode             String
+  latitude            Float?
+  longitude           Float?
+
+  // Status
+  isAvailable         Boolean           @default(true)
+  isFeatured          Boolean           @default(false)
+  
+  // Relations
+  bookings            Booking[]
+  sanitizationLogs    SanitizationLog[]
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([category, city, isAvailable])
+}
+
+model Booking {
+  id                   String            @id @default(cuid())
+  bookingNumber        String            @unique // e.g. "MOR-2026-8921"
+  listingId            String
+  listing              Listing           @relation(fields: [listingId], references: [id])
+  renterId             String
+  renter               User              @relation("RenterBookings", fields: [renterId], references: [id])
+  
+  // Dates
+  startDate            DateTime
+  endDate              DateTime
+  durationDays         Int               @default(30)
+  
+  // Financial Ledger Breakdown
+  baseRent             Float             // ₹6,000
+  securityDeposit      Float             // ₹10,000
+  consumablesAddon     Float             @default(0) // ₹199 (masks, nasal cannulas)
+  porterDeliveryFee    Float             @default(0) // ₹350
+  platformCommission   Float             // 18% of rent = ₹1,080
+  lenderPayoutRent     Float             // 82% of rent = ₹4,920
+  totalAmountCharged   Float             // baseRent + securityDeposit + consumablesAddon + porterDeliveryFee
+
+  // Status & Escrow
+  status               BookingStatus     @default(AWAITING_PAYMENT)
+  escrowStatus         EscrowStatus      @default(NOT_INITIATED)
+  
+  // Payment Gateway Reference
+  paymentGatewayTxId   String?           // Razorpay Route / Cashfree Order ID
+  escrowHoldId         String?
+
+  // Handover Verification
+  pickupOtp            String?           // Shared with Porter on pickup
+  returnOtp            String?           // Shared with Porter on return
+  prePickupVideoUrl    String?           // 5-sec video right before handover
+  postReturnVideoUrl   String?           // 5-sec video by owner upon receiving back
+
+  // Logistics Tracking
+  porterDeliveryId     String?
+  porterReturnId       String?
+  deliveryTrackingUrl  String?
+
+  // Relations
+  escrowTransactions  EscrowTransaction[]
+  disputes            Dispute[]
+  reviews             Review[]
+
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+}
+
+model EscrowTransaction {
+  id              String        @id @default(cuid())
+  bookingId       String
+  booking         Booking       @relation(fields: [bookingId], references: [id])
+  amount          Float
+  transactionType String        // "SECURITY_DEPOSIT_HOLD", "DEPOSIT_REFUND", "RENT_SPLIT_PAYOUT", "PLATFORM_FEE_COLLECTION"
+  beneficiaryType String        // "RENTER", "LENDER", "PLATFORM"
+  status          String        // "HELD", "SETTLED", "REVERSED"
+  gatewayRef      String?
+  settledAt       DateTime?
+  notes           String?
+
+  createdAt       DateTime      @default(now())
+}
+
+model Dispute {
+  id             String         @id @default(cuid())
+  bookingId      String
+  booking        Booking        @relation(fields: [bookingId], references: [id])
+  raisedById     String
+  reason         DisputeReason
+  description    String
+  evidencePhotos String[]
+  evidenceVideos String[]
+  claimAmount    Float?
+  resolvedStatus String         @default("UNDER_OPS_REVIEW") // "RESOLVED_REFUND", "RESOLVED_LENDER_PAID", "DISMISSED"
+  opsDecisionNotes String?
+  resolvedAt     DateTime?
+
+  createdAt      DateTime       @default(now())
+}
+
+model SanitizationLog {
+  id               String       @id @default(cuid())
+  listingId        String
+  listing          Listing      @relation(fields: [listingId], references: [id])
+  sanitizerAgent   String       // e.g., "SterileClean Labs" or "Owner Certified Protocol"
+  chemicalUsed     String       // e.g., "Hospital-grade Isopropyl 70% + Benzalkonium Chloride"
+  checklistJson    Json         // Checklist items verified
+  certifiedDate    DateTime     @default(now())
+}
+
+model Review {
+  id               String       @id @default(cuid())
+  bookingId        String
+  booking          Booking      @relation(fields: [bookingId], references: [id])
+  authorId         String
+  author           User         @relation("ReviewsWritten", fields: [authorId], references: [id])
+  targetUserId     String
+  targetUser       User         @relation("ReviewsReceived", fields: [targetUserId], references: [id])
+  rating           Int          // 1 to 5 stars
+  comment          String?
+
+  createdAt        DateTime     @default(now())
+}
