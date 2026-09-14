@@ -69,7 +69,7 @@ export default function Hero({
             className="px-5 sm:px-6 py-3 rounded-xl bg-gradient-to-r from-[#007791] to-[#10B981] hover:from-[#005F73] hover:to-[#059669] text-white font-bold text-xs sm:text-sm shadow-lg shadow-[#007791]/30 flex items-center justify-center space-x-2 transition-all transform active:scale-95"
           >
             <Search className="w-4 h-4" />
-            <span>Browse Available Equipment</span>
+            <span>See Available Equipment</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </a>
 
@@ -78,7 +78,7 @@ export default function Hero({
             className="px-4 sm:px-5 py-3 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-200 font-bold text-xs sm:text-sm border border-cyan-700/60 backdrop-blur-md flex items-center justify-center space-x-2 transition-all"
           >
             <FileText className="w-4 h-4 text-cyan-400" />
-            <span>Upload Discharge Slip (Match)</span>
+            <span>Upload Doctor Prescription</span>
           </button>
 
           <button
@@ -86,7 +86,7 @@ export default function Hero({
             className="px-4 sm:px-5 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-100 font-semibold text-xs sm:text-sm border border-slate-700 backdrop-blur-md flex items-center justify-center space-x-2 transition-all"
           >
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>List Idle Machine (Earn 82%)</span>
+            <span>Put My Machine on Rent</span>
           </button>
         </div>
 
@@ -95,17 +95,17 @@ export default function Hero({
           <div className="flex items-start sm:items-center space-x-2.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mt-1 sm:mt-0 flex-shrink-0"></span>
             <span className="text-slate-300 font-medium">
-              Discharged from <strong className="text-white">Max Healthcare, Medanta, Apollo, or Fortis</strong>?
+              Discharged from hospital? Need urgent setup at home?
             </span>
             <span className="text-cyan-300 font-bold hidden md:inline">
-              Our concierge coordinates 90-min bedside delivery and installation.
+              We arrange quick delivery & demo right at the patient&apos;s bedside.
             </span>
           </div>
           <button
             onClick={onOpenEscrowSimulator}
             className="text-cyan-300 hover:text-white underline underline-offset-2 font-semibold flex-shrink-0"
           >
-            Learn How Escrow Protects Your Deposit →
+            See How Your Deposit is 100% Safe →
           </button>
         </div>
 

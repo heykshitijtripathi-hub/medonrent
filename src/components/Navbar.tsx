@@ -23,6 +23,7 @@ interface NavbarProps {
   onOpenEscrowSimulator: () => void;
   onOpenMyRentals: () => void;
   onOpenLenderHub: () => void;
+  onOpenQuery: () => void;
   activeBookingsCount: number;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -46,6 +47,7 @@ export default function Navbar({
   onOpenEscrowSimulator,
   onOpenMyRentals,
   onOpenLenderHub,
+  onOpenQuery,
   activeBookingsCount,
   searchQuery,
   onSearchChange,
@@ -61,27 +63,25 @@ export default function Navbar({
         <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
           <span className="flex items-center text-emerald-400 font-medium text-[11px] sm:text-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 inline-block"></span>
-            100% Escrow Protected
+            100% Refundable Deposit Protected
           </span>
           <span className="hidden md:inline text-slate-400">•</span>
           <span className="hidden md:flex items-center text-slate-300">
             <ShieldCheck className="w-3.5 h-3.5 text-[#007791] mr-1" />
-            Aadhaar Verified • Sanitized
+            Aadhaar Verified Members • Clean Equipment
           </span>
         </div>
         <div className="flex items-center space-x-3 sm:space-x-4 text-[11px] sm:text-xs shrink-0">
           <button 
-            onClick={onOpenEscrowSimulator}
-            className="text-cyan-300 hover:text-white flex items-center font-medium underline underline-offset-2 transition-colors"
+            onClick={onOpenQuery}
+            className="text-amber-300 hover:text-white flex items-center font-semibold transition-colors"
           >
-            <Activity className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1" />
-            <span className="hidden xs:inline">How Escrow Works</span>
-            <span className="xs:hidden">Escrow</span>
+            ❓ Have a Question?
           </button>
-          <a href="tel:18001209988" className="hover:text-emerald-400 flex items-center font-medium">
+          <a href="tel:8175087004" className="hover:text-emerald-400 flex items-center font-medium">
             <PhoneCall className="w-3 h-3 mr-1 text-emerald-400" />
-            <span className="hidden sm:inline">24/7 Helpline: </span>
-            <span>1800-120-RENT</span>
+            <span className="hidden sm:inline">Call / WhatsApp: </span>
+            <span className="font-bold">+91 8175087004</span>
           </a>
         </div>
       </div>
@@ -296,6 +296,20 @@ export default function Navbar({
 
             <button
               onClick={() => {
+                onOpenQuery();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs font-bold"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">❓</span>
+                <span>Ask a Question / Request Help</span>
+              </div>
+              <span className="text-amber-700">→</span>
+            </button>
+
+            <button
+              onClick={() => {
                 onOpenEscrowSimulator();
                 setMobileMenuOpen(false);
               }}
@@ -303,7 +317,7 @@ export default function Navbar({
             >
               <div className="flex items-center space-x-2">
                 <Activity className="w-4 h-4 text-[#007791]" />
-                <span>How Escrow Protection Works</span>
+                <span>How Security Deposit Works</span>
               </div>
               <span className="text-[#007791]">→</span>
             </button>

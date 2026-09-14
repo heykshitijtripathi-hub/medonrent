@@ -117,10 +117,11 @@ export default function Footer() {
             </h4>
             <div className="space-y-2.5">
               <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs">
-                <div className="text-slate-400 text-[11px]">Toll-Free Patient Helpline:</div>
-                <a href="tel:18001209988" className="text-emerald-400 font-bold text-sm block mt-0.5 hover:underline">
-                  1800-120-RENT (9:00 AM – 9:00 PM)
+                <div className="text-slate-400 text-[11px]">Direct Patient & Caregiver Helpline:</div>
+                <a href="tel:8175087004" className="text-emerald-400 font-bold text-sm block mt-0.5 hover:underline">
+                  +91 8175087004 (Calling & WhatsApp)
                 </a>
+                <div className="text-[10px] text-slate-400 mt-1">Available 9:00 AM – 9:00 PM (Mon-Sun)</div>
               </div>
               <div className="flex items-center space-x-2 text-slate-300">
                 <Mail className="w-3.5 h-3.5 text-[#007791]" />

@@ -19,6 +19,7 @@ import HowItWorksSection from '@/components/HowItWorksSection';
 import FaqSection from '@/components/FaqSection';
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 import Footer from '@/components/Footer';
+import QueryModal from '@/components/QueryModal';
 import { INITIAL_EQUIPMENT, EquipmentItem } from '@/data/initialEquipment';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -104,6 +105,7 @@ export default function HomePage() {
   const [isListingWizardOpen, setIsListingWizardOpen] = useState<boolean>(false);
   const [isEscrowSimulatorOpen, setIsEscrowSimulatorOpen] = useState<boolean>(false);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState<boolean>(false);
+  const [isQueryModalOpen, setIsQueryModalOpen] = useState<boolean>(false);
 
   // Toast
   const [recentBookingToast, setRecentBookingToast] = useState<ToastState | null>(null);
@@ -343,6 +345,7 @@ export default function HomePage() {
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenMyRentals={() => setIsMyRentalsOpen(true)}
         onOpenLenderHub={() => setIsLenderHubOpen(true)}
+        onOpenQuery={() => setIsQueryModalOpen(true)}
         activeBookingsCount={userBookings.filter((b) => b.orderStatus !== 'COMPLETED_REFUNDED').length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -462,6 +465,12 @@ export default function HomePage() {
           setSelectedCategory(cat);
           scrollToCatalog();
         }}
+      />
+
+      {/* Query / Doubt Modal */}
+      <QueryModal
+        isOpen={isQueryModalOpen}
+        onClose={() => setIsQueryModalOpen(false)}
       />
 
       {/* Floating WhatsApp Support */}

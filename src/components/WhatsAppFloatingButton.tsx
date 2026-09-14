@@ -51,21 +51,21 @@ export default function WhatsAppFloatingButton({ onOpenPrescription }: { onOpenP
                 <span className="text-[10px] text-slate-400">→</span>
               </button>
               <a
-                href="https://wa.me/919810123456?text=Hi%20MedOnRent,%20I%20urgently%20need%20medical%20equipment%20on%20rent"
+                href="https://wa.me/918175087004?text=Hello%20MedOnRent,%20I%20need%20help%20with%20medical%20equipment%20rental"
                 target="_blank"
                 rel="noreferrer"
                 className="w-full text-left p-2 sm:p-2.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs flex items-center justify-between transition-colors shadow-sm"
               >
-                <span>💬 Chat on WhatsApp</span>
+                <span>💬 Chat on WhatsApp (+91 8175087004)</span>
                 <span className="text-white text-xs">→</span>
               </a>
               <a
-                href="tel:18001209988"
-                className="w-full text-left p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 text-[11px] font-medium flex items-center justify-between transition-colors"
+                href="tel:8175087004"
+                className="w-full text-left p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-semibold flex items-center justify-between transition-colors"
               >
-                <span className="flex items-center gap-1">
-                  <PhoneCall className="w-3 h-3 text-[#007791]" />
-                  <span>Call Toll-Free: 1800-120-RENT</span>
+                <span className="flex items-center gap-1.5">
+                  <PhoneCall className="w-3.5 h-3.5 text-[#007791]" />
+                  <span>Call Us Directly: +91 8175087004</span>
                 </span>
               </a>
             </div>
