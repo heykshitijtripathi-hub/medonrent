@@ -13,8 +13,6 @@ import MyRentalsModal from '@/components/MyRentalsModal';
 import ListingWizardModal from '@/components/ListingWizardModal';
 import EscrowSimulatorModal from '@/components/EscrowSimulatorModal';
 import PrescriptionUploadModal from '@/components/PrescriptionUploadModal';
-import SavingsCalculator from '@/components/SavingsCalculator';
-import ComparisonMatrix from '@/components/ComparisonMatrix';
 import DoctorEndorsements from '@/components/DoctorEndorsements';
 import HowItWorksSection from '@/components/HowItWorksSection';
 import FaqSection from '@/components/FaqSection';
@@ -411,12 +409,6 @@ export default function HomePage() {
           onResetFilters={handleResetFilters}
           selectedCity={selectedCity}
         />
-
-        {/* Interactive Savings Calculator */}
-        <SavingsCalculator onSelectEquipment={scrollToCatalog} />
-
-        {/* Honest Comparison Table */}
-        <ComparisonMatrix />
 
         {/* Doctor & Patient Stories */}
         <DoctorEndorsements />
