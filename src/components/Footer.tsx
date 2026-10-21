@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import { MedOnRentMark } from '@/components/MedOnRentLogo';
 import { 
   ShieldCheck, 
   Mail, 
@@ -17,14 +17,7 @@ export default function Footer() {
           {/* Col 1: Brand & Mission */}
           <div className="space-y-3">
             <div className="flex items-center space-x-2.5">
-              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-slate-700 bg-white">
-                <Image
-                  src="/assets/medonrent-app-icon.jpg"
-                  alt="MedOnRent Icon"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <MedOnRentMark size={32} />
               <span className="text-lg font-black tracking-tight text-white">
                 Med<span className="text-[#007791]">On</span><span className="text-[#10B981]">Rent</span>
               </span>

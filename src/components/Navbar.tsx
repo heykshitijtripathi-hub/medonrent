@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
+import { MedOnRentMark } from '@/components/MedOnRentLogo';
 import { useAuth } from '@/context/AuthContext';
 import { 
   Search, 
@@ -51,14 +51,8 @@ export default function Navbar({
         {/* Left: Brand Logo + Location Underneath (Exact RentoMojo layout) */}
         <div className="flex items-center space-x-3 shrink-0">
           <div className="flex items-center space-x-2">
-            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden shadow-xs border border-slate-100 bg-white shrink-0">
-              <Image
-                src="/assets/medonrent-app-icon.jpg"
-                alt="MedOnRent Logo"
-                fill
-                className="object-cover"
-                priority
-              />
+            <div className="shrink-0 p-0.5">
+              <MedOnRentMark size={34} />
             </div>
             <div>
               <div className="text-base sm:text-lg font-black tracking-tight text-[#0B192C] leading-none">
