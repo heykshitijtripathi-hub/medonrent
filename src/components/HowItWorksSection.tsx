@@ -56,9 +56,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-cyan-50 text-[#007791] flex items-center justify-center font-black text-sm mb-4">
                 1
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Find Nearby Machine</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Choose Your Equipment</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Filter verified equipment within 2–10 km in your metro. Review the 5-sec proof video and hospital disinfection badge.
+                Pick the equipment you need, check condition photos and live working video proof, then select your rental duration.
               </p>
             </div>
 
@@ -66,9 +66,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-cyan-50 text-[#007791] flex items-center justify-center font-black text-sm mb-4">
                 2
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Pay with Escrow Lock</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Secure Escrow Booking</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Your rent and security deposit are securely locked in an RBI-compliant escrow account. Funds are never released until handover.
+                Pay your monthly rent and refundable security deposit. Your money stays safely in escrow until you receive and verify the item.
               </p>
             </div>
 
@@ -76,9 +76,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-cyan-50 text-[#007791] flex items-center justify-center font-black text-sm mb-4">
                 3
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Doorstep Porter Delivery</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Doorstep Delivery & Setup</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Porter collects the sanitized gear directly from the owner with secure OTP verification and delivers straight to patient bedside.
+                The sanitized equipment is delivered directly to your home with OTP confirmation. Ready to use immediately.
               </p>
             </div>
 
@@ -86,9 +86,9 @@ export default function HowItWorksSection() {
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#059669] flex items-center justify-center font-black text-sm mb-4">
                 4
               </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Instant Deposit Refund</h3>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">Easy Return & Instant Refund</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Upon patient recovery, reverse courier returns the gear. 100% of your deposit is refunded directly to your UPI account in seconds.
+                When patient recovers, request a pickup with 1 tap. Your 100% security deposit is refunded straight back to your UPI or bank account.
               </p>
             </div>
           </div>

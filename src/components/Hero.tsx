@@ -37,14 +37,14 @@ export default function Hero({
 
         {/* Main Headline */}
         <div className="max-w-3xl">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white mb-3 sm:mb-4">
-            Care in Circulation. <br />
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white mb-3 sm:mb-4">
+            Medical Equipment on Rent <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400">
-              Why Buy When You Can Rent?
+              Delivered Right to Your Doorstep
             </span>
           </h1>
           <p className="text-xs sm:text-sm md:text-base text-slate-300 font-normal leading-relaxed mb-6 sm:mb-8 max-w-2xl">
-            Rent hospital-sanitized oxygen concentrators, motorized ICU beds, and electric wheelchairs directly from verified families nearby. Delivered to your doorstep with 100% deposit protection.
+            Rent certified, sanitized oxygen concentrators, hospital ICU beds, BiPAP machines, and wheelchairs in Delhi NCR. Affordable monthly plans with same-day delivery and 100% refundable security deposit.
           </p>
         </div>
 
