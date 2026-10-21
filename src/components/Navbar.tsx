@@ -50,12 +50,12 @@ export default function Navbar({
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-6 w-full">
         {/* Left: Brand Logo + Location Underneath (Exact RentoMojo layout) */}
         <div className="flex items-center space-x-3 shrink-0">
-          <div className="flex items-center space-x-2">
-            <div className="shrink-0 p-0.5">
-              <MedOnRentMark size={34} />
+          <div className="flex items-center space-x-2.5">
+            <div className="shrink-0 flex items-center justify-center">
+              <MedOnRentMark size={32} />
             </div>
-            <div>
-              <div className="text-base sm:text-lg font-black tracking-tight text-[#0B192C] leading-none">
+            <div className="flex flex-col">
+              <div className="text-base sm:text-lg font-black tracking-tight text-[#0B192C] leading-none whitespace-nowrap">
                 Med<span className="text-[#007791]">On</span><span className="text-[#10B981]">Rent</span>
               </div>
               {/* City Underneath with Dropdown Indicator */}
