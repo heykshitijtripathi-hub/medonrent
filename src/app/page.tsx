@@ -22,9 +22,12 @@ import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 import Footer from '@/components/Footer';
 import QueryModal from '@/components/QueryModal';
 import GoogleAuthModal from '@/components/GoogleAuthModal';
+import QuickViewModal from '@/components/QuickViewModal';
+import CartDrawer from '@/components/CartDrawer';
 import { AuthProvider } from '@/context/AuthContext';
+import { CartProvider, useCart } from '@/context/CartContext';
 import { INITIAL_EQUIPMENT, EquipmentItem } from '@/data/initialEquipment';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ShoppingCart } from 'lucide-react';
 
 interface ToastState {
   title: string;
@@ -101,8 +104,10 @@ export default function HomePage() {
 
   // Modals
   const [selectedProduct, setSelectedProduct] = useState<EquipmentItem | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<EquipmentItem | null>(null);
   const [checkoutProduct, setCheckoutProduct] = useState<EquipmentItem | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isMyRentalsOpen, setIsMyRentalsOpen] = useState<boolean>(false);
   const [isListingWizardOpen, setIsListingWizardOpen] = useState<boolean>(false);
   const [isEscrowSimulatorOpen, setIsEscrowSimulatorOpen] = useState<boolean>(false);
@@ -326,6 +331,7 @@ export default function HomePage() {
 
   return (
     <AuthProvider>
+      <CartProvider>
       <div className="min-h-screen flex flex-col bg-[#F8FAFC] overflow-x-hidden w-full">
       {/* Toast Notification */}
       {recentBookingToast && (
@@ -359,6 +365,7 @@ export default function HomePage() {
         activeBookingsCount={userBookings.filter((b) => b.orderStatus !== 'COMPLETED_REFUNDED').length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        onOpenCart={() => setIsCartOpen(true)}
       />
 
       {/* Hero Section */}
@@ -400,6 +407,7 @@ export default function HomePage() {
         <EquipmentGrid
           items={filteredEquipment}
           onSelectItem={(item) => setSelectedProduct(item)}
+          onQuickView={(item) => setQuickViewProduct(item)}
           onResetFilters={handleResetFilters}
           selectedCity={selectedCity}
         />
@@ -419,6 +427,27 @@ export default function HomePage() {
         {/* Frequently Asked Questions */}
         <FaqSection />
       </main>
+
+      {/* Quick View Modal */}
+      <QuickViewModal
+        item={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onViewFull={(item) => {
+          setQuickViewProduct(null);
+          setSelectedProduct(item);
+        }}
+      />
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onCheckout={() => {
+          setIsCartOpen(false);
+          // Open checkout with first cart item
+          setIsCheckoutOpen(true);
+        }}
+      />
 
       {/* Product Detail Modal */}
       <ProductDetailModal
@@ -497,9 +526,29 @@ export default function HomePage() {
         onOpenPrescription={() => setIsPrescriptionModalOpen(true)}
       />
 
+      {/* Floating Cart Button */}
+      <CartFloatingButton onOpenCart={() => setIsCartOpen(true)} />
+
       {/* Footer */}
       <Footer />
     </div>
+    </CartProvider>
   </AuthProvider>
 );
+}
+
+// Floating Cart Button — uses useCart inside CartProvider
+function CartFloatingButton({ onOpenCart }: { onOpenCart: () => void }) {
+  const { cartCount } = useCart();
+  if (cartCount === 0) return null;
+  return (
+    <button
+      onClick={onOpenCart}
+      className="fixed bottom-20 right-4 z-40 bg-[#E53E3E] text-white rounded-full shadow-2xl flex items-center gap-2 px-4 py-3 font-bold text-sm hover:bg-[#C53030] transition-all active:scale-95 animate-in slide-in-from-bottom-4 duration-300"
+    >
+      <ShoppingCart className="w-5 h-5" />
+      <span>{cartCount} item{cartCount > 1 ? 's' : ''} in cart</span>
+      <span className="bg-white text-[#E53E3E] text-xs font-black px-1.5 py-0.5 rounded-full">→</span>
+    </button>
+  );
 }

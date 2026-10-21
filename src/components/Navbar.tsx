@@ -10,7 +10,8 @@ import {
   Menu, 
   X,
   Activity,
-  PlusCircle
+  PlusCircle,
+  ShoppingCart
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -20,6 +21,7 @@ interface NavbarProps {
   onOpenEscrowSimulator: () => void;
   onOpenMyRentals: () => void;
   onOpenQuery: () => void;
+  onOpenCart: () => void;
   activeBookingsCount: number;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -32,6 +34,7 @@ export default function Navbar({
   onOpenEscrowSimulator,
   onOpenMyRentals,
   onOpenQuery,
+  onOpenCart,
   activeBookingsCount,
   searchQuery,
   onSearchChange,
@@ -124,6 +127,15 @@ export default function Navbar({
                 {activeBookingsCount}
               </span>
             )}
+          </button>
+
+          {/* Cart Icon */}
+          <button
+            onClick={onOpenCart}
+            className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+            title="My Cart"
+          >
+            <ShoppingCart className="w-5 h-5 text-slate-700" />
           </button>
 
           {/* Primary Action: Login/Signup with Google (RentoMojo red/teal button style) */}

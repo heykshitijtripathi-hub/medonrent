@@ -44,6 +44,7 @@ export default function ListingWizardModal({
     bankAccount: '1092837465',
     bankIfsc: 'HDFC0001042',
     description: 'Pristine medical condition, single patient use during recovery. All filters replaced with new OEM filter.',
+    condition: 'Like New',
     videoUploaded: true,
   });
 
@@ -161,6 +162,31 @@ export default function ListingWizardModal({
                     placeholder="e.g. EverFlo 5L with OPI"
                     className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30"
                   />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Product Condition</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { val: 'Like New', label: 'Brand New', desc: 'Flawless condition' },
+                    { val: 'Gently Used', label: 'Good', desc: 'Minor signs of use' },
+                    { val: 'Certified Refurbished', label: 'Fair', desc: 'Tested & functioning' },
+                  ].map((c) => (
+                    <button
+                      key={c.val}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, condition: c.val })}
+                      className={`p-2 rounded-xl border text-left transition-all ${
+                        formData.condition === c.val
+                          ? 'border-[#007791] bg-cyan-50/60 ring-2 ring-[#007791]/20'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="font-bold text-slate-900 text-xs">{c.label}</div>
+                      <div className="text-[10px] text-slate-500">{c.desc}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
 

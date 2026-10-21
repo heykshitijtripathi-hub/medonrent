@@ -8,6 +8,7 @@ import { Search, RefreshCcw } from 'lucide-react';
 interface EquipmentGridProps {
   items: EquipmentItem[];
   onSelectItem: (item: EquipmentItem) => void;
+  onQuickView: (item: EquipmentItem) => void;
   onResetFilters: () => void;
   selectedCity: string;
 }
@@ -15,6 +16,7 @@ interface EquipmentGridProps {
 export default function EquipmentGrid({
   items,
   onSelectItem,
+  onQuickView,
   onResetFilters,
   selectedCity,
 }: EquipmentGridProps) {
@@ -56,7 +58,12 @@ export default function EquipmentGrid({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
-            <EquipmentCard key={item.id} item={item} onSelect={onSelectItem} />
+            <EquipmentCard
+              key={item.id}
+              item={item}
+              onSelect={onSelectItem}
+              onQuickView={onQuickView}
+            />
           ))}
         </div>
       )}

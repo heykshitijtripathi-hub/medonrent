@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { 
   ShieldCheck, 
@@ -9,22 +9,47 @@ import {
   Video, 
   Star, 
   ChevronRight, 
-  Lock 
+  Lock,
+  ShoppingCart,
+  Eye,
+  CheckCircle2
 } from 'lucide-react';
 import { EquipmentItem } from '@/data/initialEquipment';
+import { useCart } from '@/context/CartContext';
 
 interface EquipmentCardProps {
   item: EquipmentItem;
   onSelect: (item: EquipmentItem) => void;
+  onQuickView: (item: EquipmentItem) => void;
 }
 
-export default function EquipmentCard({ item, onSelect }: EquipmentCardProps) {
+const CONDITION_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  'Like New':             { label: 'Brand New', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+  'Gently Used':          { label: 'Good',       color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200' },
+  'Certified Refurbished':{ label: 'Fair',        color: 'text-amber-700',  bg: 'bg-amber-50 border-amber-200' },
+};
+
+export default function EquipmentCard({ item, onSelect, onQuickView }: EquipmentCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const { addToCart, cartItems } = useCart();
+  const inCart = cartItems.some(c => c.item.id === item.id);
+
   const savingsPct = Math.round(
     ((item.originalPrice - item.monthlyRent) / item.originalPrice) * 100
   );
+  const cond = CONDITION_CONFIG[item.condition] || CONDITION_CONFIG['Gently Used'];
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart(item, 1);
+  };
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-clinical hover:border-[#007791]/50 transition-all duration-300 flex flex-col overflow-hidden">
+    <div
+      className="group bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-clinical hover:border-[#007791]/50 transition-all duration-300 flex flex-col overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Image & Overlay Badges */}
       <div className="relative h-48 w-full bg-slate-100 overflow-hidden">
         <Image
@@ -49,6 +74,24 @@ export default function EquipmentCard({ item, onSelect }: EquipmentCardProps) {
             </div>
           )}
         </div>
+
+        {/* Condition Badge */}
+        <div className={`absolute top-10 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold border ${cond.bg} ${cond.color}`}>
+          {cond.label}
+        </div>
+
+        {/* Quick View Overlay — shows on hover */}
+        {isHovered && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-all">
+            <button
+              onClick={(e) => { e.stopPropagation(); onQuickView(item); }}
+              className="flex items-center space-x-2 bg-white text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl shadow-xl hover:bg-slate-50 transition-colors"
+            >
+              <Eye className="w-4 h-4 text-[#007791]" />
+              <span>Quick View</span>
+            </button>
+          </div>
+        )}
 
         {/* Bottom Image Overlay: Location & Sanitization */}
         <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-white font-medium">
@@ -135,14 +178,27 @@ export default function EquipmentCard({ item, onSelect }: EquipmentCardProps) {
             )}
           </div>
 
-          {/* CTA */}
-          <button
-            onClick={() => onSelect(item)}
-            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0B192C] to-[#1E2E45] hover:from-[#007791] hover:to-[#005F73] text-white font-semibold text-xs shadow-sm flex items-center justify-center space-x-1.5 transition-all active:scale-[0.98]"
-          >
-            <span>View Details & Book with Escrow</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          {/* CTA Buttons — View Details + Add to Cart */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => onSelect(item)}
+              className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#0B192C] to-[#1E2E45] hover:from-[#007791] hover:to-[#005F73] text-white font-semibold text-xs shadow-sm flex items-center justify-center space-x-1 transition-all active:scale-[0.98]"
+            >
+              <span>View & Book</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleAddToCart}
+              title={inCart ? 'In cart' : 'Add to cart'}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-[0.95] border ${
+                inCart
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                  : 'bg-[#E53E3E] border-[#E53E3E] text-white hover:bg-[#C53030]'
+              }`}
+            >
+              {inCart ? <CheckCircle2 className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </div>
     </div>
