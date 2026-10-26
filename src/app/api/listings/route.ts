@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { INITIAL_EQUIPMENT, EquipmentItem } from '@/data/initialEquipment';
+import { listingsDatabase } from '@/app/api/_data/listingsDatabase';
+import { EquipmentItem } from '@/data/initialEquipment';
 
 // In-memory persistent state during server runtime
-const listingsDatabase: EquipmentItem[] = [...INITIAL_EQUIPMENT];
+// In-memory persistent state is now imported from shared module
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -106,6 +107,14 @@ export async function POST(request: Request) {
         'Direct Porter doorstep handover',
       ],
       instantDispatch: true,
+      ownerPricePerDay: Number(body.ownerPricePerDay || Math.round(Number(body.monthlyRent) / 30 * 0.85)),
+      commissionPercent: 15,
+      dailyRent: Number(body.dailyRent || Math.round(Number(body.monthlyRent) / 30)),
+      status: 'Pending approval',
+      purchaseInvoiceVerified: false,
+      purchaseInvoiceUrl: body.purchaseInvoiceName || 'Invoice_Attached.pdf',
+      requiresPrescription: body.category === 'RESPIRATORY',
+      bookedDates: [],
     };
 
     listingsDatabase.unshift(newListing);

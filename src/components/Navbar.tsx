@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { MedOnRentMark } from '@/components/MedOnRentLogo';
 import { useAuth } from '@/context/AuthContext';
 import { 
@@ -9,19 +10,24 @@ import {
   Package, 
   Menu, 
   X,
-  Activity,
   PlusCircle,
-  ShoppingCart
+  ShoppingCart,
+  BookOpen,
+  Building2,
+  ShieldCheck,
+  HelpCircle
 } from 'lucide-react';
 
 interface NavbarProps {
   selectedCity: string;
   onOpenLocationModal: () => void;
   onOpenListingWizard: () => void;
+  onOpenOwnerHub: () => void;
   onOpenEscrowSimulator: () => void;
   onOpenMyRentals: () => void;
   onOpenQuery: () => void;
   onOpenCart: () => void;
+  onOpenPlainEnglishGuide: () => void;
   activeBookingsCount: number;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -31,10 +37,12 @@ export default function Navbar({
   selectedCity,
   onOpenLocationModal,
   onOpenListingWizard,
+  onOpenOwnerHub,
   onOpenEscrowSimulator,
   onOpenMyRentals,
   onOpenQuery,
   onOpenCart,
+  onOpenPlainEnglishGuide,
   activeBookingsCount,
   searchQuery,
   onSearchChange,
@@ -46,11 +54,12 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-xs transition-all w-full">
-      {/* RentoMojo-style Main Header Row */}
+      {/* Main Header Row */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-6 w-full">
-        {/* Left: Brand Logo + Location Underneath (Exact RentoMojo layout) */}
+        
+        {/* Left: Brand Logo + Location Underneath */}
         <div className="flex items-center space-x-3 shrink-0">
-          <div className="flex items-center space-x-2.5">
+          <Link href="/" className="flex items-center space-x-2.5">
             <div className="shrink-0 flex items-center justify-center">
               <MedOnRentMark size={32} />
             </div>
@@ -58,23 +67,26 @@ export default function Navbar({
               <div className="text-base sm:text-lg font-black tracking-tight text-[#0B192C] leading-none whitespace-nowrap">
                 Med<span className="text-[#007791]">On</span><span className="text-[#10B981]">Rent</span>
               </div>
-              {/* City Underneath with Dropdown Indicator */}
               <button
-                onClick={onOpenLocationModal}
-                className="flex items-center space-x-0.5 text-[11px] sm:text-xs font-semibold text-slate-500 hover:text-[#007791] transition-colors mt-0.5"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenLocationModal();
+                }}
+                className="flex items-center space-x-0.5 text-[11px] sm:text-xs font-semibold text-slate-500 hover:text-[#007791] transition-colors mt-0.5 text-left"
               >
                 <span className="truncate max-w-[110px]">{selectedCity}</span>
                 <ChevronDown className="w-3 h-3 text-slate-400" />
               </button>
             </div>
-          </div>
+          </Link>
         </div>
 
-        {/* Center: Wide, clean search bar (Exact RentoMojo pill style) */}
-        <div className="flex-1 max-w-xl relative hidden md:block">
+        {/* Center: Search Bar */}
+        <div className="flex-1 max-w-lg relative hidden md:block">
           <input
             type="text"
-            placeholder="Search for medical equipment to rent (Oxygen, ICU Bed, Wheelchair...)"
+            placeholder="Search medical equipment (Oxygen, ICU Bed, Wheelchair, CPAP)..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-4 pr-10 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#007791]/30 focus:border-[#007791] transition-all placeholder:text-slate-400 font-medium"
@@ -90,30 +102,62 @@ export default function Navbar({
           )}
         </div>
 
-        {/* Right: Desktop Links & Login/Signup Button */}
-        <div className="hidden md:flex items-center space-x-3 lg:space-x-4 shrink-0">
-          {/* List & Earn / Lender */}
+        {/* Right: Desktop Links */}
+        <div className="hidden md:flex items-center space-x-2.5 lg:space-x-3.5 shrink-0">
+          
+          {/* Plain-English Guide Interactive Button */}
+          <button
+            onClick={onOpenPlainEnglishGuide}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-[#007791] border border-cyan-200 text-xs font-bold transition-all shadow-xs"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#007791]" />
+            <span>Plain-English Guide</span>
+            <span className="text-[9px] bg-[#007791] text-white px-1.5 py-0.2 rounded-full font-black">
+              13 Steps
+            </span>
+          </button>
+
+          {/* Owner Hub (Lister) */}
+          <button
+            onClick={onOpenOwnerHub}
+            className="text-xs font-semibold text-slate-700 hover:text-amber-700 transition-colors flex items-center space-x-1"
+          >
+            <Building2 className="w-3.5 h-3.5 text-amber-600" />
+            <span>Owner Hub</span>
+          </button>
+
+          {/* List & Earn / Add Equipment */}
           <button
             onClick={onOpenListingWizard}
             className="text-xs font-semibold text-slate-700 hover:text-[#007791] transition-colors flex items-center space-x-1"
           >
             <PlusCircle className="w-3.5 h-3.5 text-[#007791]" />
-            <span>List & Earn</span>
+            <span>+ List Machine</span>
           </button>
+
+          {/* Admin Control Link */}
+          <Link
+            href="/admin"
+            className="text-xs font-semibold text-slate-700 hover:text-[#007791] transition-colors flex items-center space-x-1"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+            <span>Admin</span>
+          </Link>
 
           {/* Need Help? Link */}
           <button
             onClick={onOpenQuery}
-            className="text-xs font-semibold text-slate-700 hover:text-[#007791] transition-colors"
+            className="text-xs font-semibold text-slate-700 hover:text-[#007791] transition-colors flex items-center space-x-1"
           >
-            Help & FAQ
+            <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
+            <span>Help</span>
           </button>
 
-          {/* My Rentals (Bag / Cart Icon with Badge) */}
+          {/* My Rentals (Buyer Dashboard) */}
           <button
             onClick={onOpenMyRentals}
             className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
-            title="My Active Rentals"
+            title="Buyer Dashboard (Active Rentals)"
           >
             <Package className="w-5 h-5 text-slate-700" />
             {activeBookingsCount > 0 && (
@@ -132,19 +176,13 @@ export default function Navbar({
             <ShoppingCart className="w-5 h-5 text-slate-700" />
           </button>
 
-          {/* Primary Action: Login/Signup with Google (RentoMojo red/teal button style) */}
+          {/* User Profile / Login */}
           {!user ? (
             <button
               onClick={openAuthModal}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#007791] hover:bg-[#005f73] text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#007791] hover:bg-[#005f73] text-white text-xs font-bold shadow-xs transition-all active:scale-95"
             >
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0 bg-white rounded-full p-0.5">
-                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z" />
-                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z" />
-                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" />
-                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
-              </svg>
-              <span>Login / Signup</span>
+              <span>Login / Sign Up</span>
             </button>
           ) : (
             <div className="relative">
@@ -174,8 +212,26 @@ export default function Navbar({
                       className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-cyan-50/50 hover:text-[#007791] rounded-xl flex items-center space-x-2"
                     >
                       <Package className="w-3.5 h-3.5 text-[#007791]" />
-                      <span>My Active Rentals ({activeBookingsCount})</span>
+                      <span>Buyer Dashboard ({activeBookingsCount})</span>
                     </button>
+                    <button
+                      onClick={() => {
+                        onOpenOwnerHub();
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-800 rounded-xl flex items-center space-x-2"
+                    >
+                      <Building2 className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Owner Hub & Earnings</span>
+                    </button>
+                    <Link
+                      href="/admin"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-800 rounded-xl flex items-center space-x-2"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+                      <span>Admin Control Center</span>
+                    </Link>
                     <button
                       onClick={() => {
                         logout();
@@ -192,9 +248,14 @@ export default function Navbar({
           )}
         </div>
 
-        {/* Mobile Right Icons: Search + Cart/Rentals + Menu */}
+        {/* Mobile Right Icons */}
         <div className="flex md:hidden items-center space-x-1.5">
-          {/* Mobile Search Icon */}
+          <button
+            onClick={onOpenPlainEnglishGuide}
+            className="p-1.5 rounded-xl bg-cyan-50 text-[#007791] text-[10px] font-bold border border-cyan-200"
+          >
+            Guide
+          </button>
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
             className="p-2 rounded-xl text-slate-700 hover:bg-slate-100"
@@ -202,8 +263,6 @@ export default function Navbar({
           >
             <Search className="w-5 h-5" />
           </button>
-
-          {/* Mobile My Rentals Icon */}
           <button
             onClick={onOpenMyRentals}
             className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100"
@@ -211,29 +270,11 @@ export default function Navbar({
           >
             <Package className="w-5 h-5" />
             {activeBookingsCount > 0 && (
-              <span className="absolute 1 top-1 right-1 w-3.5 h-3.5 rounded-full bg-[#007791] text-white text-[8px] font-black flex items-center justify-center">
+              <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-[#007791] text-white text-[8px] font-black flex items-center justify-center">
                 {activeBookingsCount}
               </span>
             )}
           </button>
-
-          {/* Login or Hamburger */}
-          {!user ? (
-            <button
-              onClick={openAuthModal}
-              className="px-2.5 py-1.5 rounded-xl bg-[#007791] text-white text-xs font-bold"
-            >
-              Login
-            </button>
-          ) : (
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="w-7 h-7 rounded-full bg-[#007791] text-white flex items-center justify-center font-bold text-xs"
-            >
-              {user.name.charAt(0).toUpperCase()}
-            </button>
-          )}
-
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-xl text-slate-700 hover:bg-slate-100"
@@ -246,7 +287,7 @@ export default function Navbar({
 
       {/* Mobile Search Bar Dropdown */}
       {showMobileSearch && (
-        <div className="md:hidden px-3 pb-3 pt-1 border-t border-slate-100 bg-slate-50 animate-in slide-in-from-top-2 w-full">
+        <div className="md:hidden px-3 pb-3 pt-1 border-t border-slate-100 bg-slate-50 w-full">
           <div className="relative">
             <input
               type="text"
@@ -270,8 +311,69 @@ export default function Navbar({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-3 animate-in slide-in-from-top-2 shadow-xl w-full">
-          {/* Location button in drawer */}
+        <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-3 shadow-xl w-full">
+          <button
+            onClick={() => {
+              onOpenPlainEnglishGuide();
+              setMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-cyan-50 border border-cyan-200 text-xs font-bold text-[#007791]"
+          >
+            <div className="flex items-center space-x-2">
+              <BookOpen className="w-4 h-4 text-[#007791]" />
+              <span>Complete Plain-English Guide (13 Steps)</span>
+            </div>
+            <span>→</span>
+          </button>
+
+          <button
+            onClick={() => {
+              onOpenOwnerHub();
+              setMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900"
+          >
+            <div className="flex items-center space-x-2">
+              <Building2 className="w-4 h-4 text-amber-600" />
+              <span>Owner Hub & Earnings</span>
+            </div>
+            <span>→</span>
+          </button>
+
+          <button
+            onClick={() => {
+              onOpenListingWizard();
+              setMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-[#007791] text-white text-xs font-bold"
+          >
+            <span>+ List Equipment & Earn</span>
+            <span>→</span>
+          </button>
+
+          <Link
+            href="/admin"
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-sky-50 border border-sky-200 text-xs font-bold text-sky-900"
+          >
+            <div className="flex items-center space-x-2">
+              <ShieldCheck className="w-4 h-4 text-sky-600" />
+              <span>Admin Control Center (8 Modules)</span>
+            </div>
+            <span>→</span>
+          </Link>
+
+          <button
+            onClick={() => {
+              onOpenEscrowSimulator();
+              setMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800"
+          >
+            <span>How Deposit Escrow Works</span>
+            <span>→</span>
+          </button>
+
           <button
             onClick={() => {
               onOpenLocationModal();
@@ -286,43 +388,6 @@ export default function Navbar({
             <span className="text-slate-400">Change ⌵</span>
           </button>
 
-          {/* Links */}
-          <button
-            onClick={() => {
-              onOpenListingWizard();
-              setMobileMenuOpen(false);
-            }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-[#007791] text-white text-xs font-bold"
-          >
-            <span>Put Medical Machine on Rent</span>
-            <span>→</span>
-          </button>
-
-          <button
-            onClick={() => {
-              onOpenQuery();
-              setMobileMenuOpen(false);
-            }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold"
-          >
-            <span>Ask a Question / Request Help</span>
-            <span>→</span>
-          </button>
-
-          <button
-            onClick={() => {
-              onOpenEscrowSimulator();
-              setMobileMenuOpen(false);
-            }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold"
-          >
-            <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-[#007791]" />
-              <span>How Security Deposit Works</span>
-            </div>
-            <span>→</span>
-          </button>
-
           {user && (
             <button
               onClick={() => {
@@ -334,10 +399,6 @@ export default function Navbar({
               Sign Out ({user.email})
             </button>
           )}
-
-          <div className="pt-2 text-center text-xs text-slate-500">
-            Helpline: <a href="tel:8175087004" className="font-bold text-[#007791]">+91 8175087004</a>
-          </div>
         </div>
       )}
     </header>

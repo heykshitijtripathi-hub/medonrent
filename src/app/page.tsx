@@ -11,6 +11,8 @@ import ProductDetailModal from '@/components/ProductDetailModal';
 import CheckoutModal, { CompletedBooking } from '@/components/CheckoutModal';
 import MyRentalsModal from '@/components/MyRentalsModal';
 import ListingWizardModal from '@/components/ListingWizardModal';
+import LenderHubModal from '@/components/LenderHubModal';
+import PlainEnglishGuideModal from '@/components/PlainEnglishGuideModal';
 import EscrowSimulatorModal from '@/components/EscrowSimulatorModal';
 import PrescriptionUploadModal from '@/components/PrescriptionUploadModal';
 import DoctorEndorsements from '@/components/DoctorEndorsements';
@@ -66,7 +68,7 @@ export default function HomePage() {
   // Equipment List
   const [equipmentList, setEquipmentList] = useState<EquipmentItem[]>(INITIAL_EQUIPMENT);
 
-  // User Bookings State (Seed 1 realistic initial booking)
+  // User Bookings State (Seed 1 realistic initial booking aligned with Guide)
   const [userBookings, setUserBookings] = useState<CompletedBooking[]>([
     {
       bookingId: 'MOR-2026-8921',
@@ -75,28 +77,38 @@ export default function HomePage() {
       patientPhone: '+91 98110 49281',
       deliveryAddress: 'Flat 302, DLF Phase 2, Gurugram, Delhi NCR - 122002',
       pincode: '122002',
-      tenureDays: 30,
-      startDate: '01 Sept 2026',
-      endDate: '01 Oct 2026',
+      tenureDays: 5,
+      startDate: '24 Oct 2026',
+      endDate: '29 Oct 2026',
       paymentMethod: 'UPI (GPay - kamla.v@okhdfcbank)',
-      transactionId: 'TXN_ESCROW_9182301',
+      transactionId: 'TXN_RAZORPAY_9182301',
       financials: {
-        baseRent: 5800,
-        securityDeposit: 10000,
-        consumables: 199,
-        porterDelivery: 350,
-        totalPaid: 16349,
-        refundableDeposit: 10000,
+        ownerDailyRate: 500,
+        commissionDaily: 75,
+        commissionPercent: 15,
+        buyerDailyRate: 575,
+        baseRent: 2875,
+        securityDeposit: 2000,
+        consumables: 0,
+        porterDelivery: 150,
+        totalPaid: 5025,
+        refundableDeposit: 2000,
+        ownerShare: 2500,
+        adminCommission: 375,
+        damageDeduction: 0,
+        depositRefunded: 0,
+        ownerPayoutStatus: 'PENDING_RETURN',
       },
       porterTracking: {
         status: 'DELIVERED',
         driverName: 'Mukesh Kumar',
         driverPhone: '+91 98711 50291',
-        vehicleNumber: 'HR 26 DQ 8192 (Porter Mini)',
+        vehicleNumber: 'HR 26 DQ 8192 (Courier Mini)',
         pickupOtp: '8492',
         returnOtp: '3910',
       },
-      orderStatus: 'ACTIVE_CARE',
+      orderStatus: 'Delivered',
+      prescriptionUploaded: true,
     },
   ]);
 
@@ -108,12 +120,14 @@ export default function HomePage() {
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isMyRentalsOpen, setIsMyRentalsOpen] = useState<boolean>(false);
   const [isListingWizardOpen, setIsListingWizardOpen] = useState<boolean>(false);
+  const [isOwnerHubOpen, setIsOwnerHubOpen] = useState<boolean>(false);
+  const [isPlainEnglishGuideOpen, setIsPlainEnglishGuideOpen] = useState<boolean>(false);
   const [isEscrowSimulatorOpen, setIsEscrowSimulatorOpen] = useState<boolean>(false);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState<boolean>(false);
   const [isQueryModalOpen, setIsQueryModalOpen] = useState<boolean>(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState<boolean>(false);
 
-  // Initial location chooser (RentoMojo first-visit algorithm)
+  // Initial location chooser
   useEffect(() => {
     try {
       const saved = localStorage.getItem('mor_selected_city');
@@ -148,22 +162,18 @@ export default function HomePage() {
             });
             setTimeout(() => setRecentBookingToast(null), 4000);
           },
-          () => {
-            // Default to central Gurugram coordinates if permission denied
-            setUserCoords({ lat: 28.4870, lng: 77.0890 });
+          (err) => {
+            console.warn(err);
+            setUserCoords({ lat: 28.4595, lng: 77.0266 });
             setIsNearMeActive(true);
-            setDetectedLocalityName('DLF Phase 2');
+            setDetectedLocalityName('Gurugram Center');
             setRecentBookingToast({
-              title: '📍 Location Set to Delhi NCR',
-              message: 'Sorted by distance from central healthcare cluster.',
+              title: '📍 Default Near Me Enabled',
+              message: 'Showing equipment in 25km radius around Gurugram.',
             });
             setTimeout(() => setRecentBookingToast(null), 4000);
           }
         );
-      } else {
-        setUserCoords({ lat: 28.4870, lng: 77.0890 });
-        setIsNearMeActive(true);
-        setDetectedLocalityName('DLF Phase 2');
       }
     } else {
       setIsNearMeActive(false);
@@ -171,83 +181,101 @@ export default function HomePage() {
     }
   };
 
-  // Filtered & Sorted Equipment
+  // Filtered and Sorted Equipment
   const filteredEquipment = useMemo(() => {
-    let list = equipmentList.map((item) => {
-      let calculatedDistance = item.distanceKm;
-      if (userCoords && item.lat && item.lng) {
-        calculatedDistance = calculateDistanceKm(userCoords.lat, userCoords.lng, item.lat, item.lng);
-      }
-      return {
-        ...item,
-        distanceKm: calculatedDistance,
-      };
-    });
+    return equipmentList
+      .filter((item) => {
+        // Only show LIVE items in public catalog (Guide Step 4 & 5)
+        if (item.status !== 'Live') return false;
 
-    // Category
-    if (selectedCategory !== 'ALL') {
-      list = list.filter((item) => item.category === selectedCategory);
-    }
+        // City Filter
+        if (selectedCity && selectedCity !== 'All Cities' && item.city !== selectedCity) {
+          return false;
+        }
 
-    // City
-    if (selectedCity !== 'All Cities') {
-      list = list.filter((item) => item.city.toLowerCase().includes(selectedCity.toLowerCase()));
-    }
+        // Category Filter
+        if (selectedCategory !== 'ALL' && item.category !== selectedCategory) {
+          return false;
+        }
 
-    // Sanitized only
-    if (sanitizedOnly) {
-      list = list.filter((item) => item.isSanitized);
-    }
+        // Search Query
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchTitle = item.title.toLowerCase().includes(q);
+          const matchBrand = item.brand.toLowerCase().includes(q);
+          const matchDesc = item.description.toLowerCase().includes(q);
+          const matchLoc = item.locality.toLowerCase().includes(q);
+          if (!matchTitle && !matchBrand && !matchDesc && !matchLoc) {
+            return false;
+          }
+        }
 
-    // Instant only
-    if (instantOnly) {
-      list = list.filter((item) => item.instantDispatch);
-    }
+        // Sanitized only
+        if (sanitizedOnly && !item.isSanitized) {
+          return false;
+        }
 
-    // Max price
-    list = list.filter((item) => item.monthlyRent <= maxPrice);
+        // Instant only
+        if (instantOnly && !item.instantDispatch) {
+          return false;
+        }
 
-    // Radius Filter
-    list = list.filter((item) => item.distanceKm <= selectedRadiusKm);
+        // Price Filter
+        if (item.monthlyRent > maxPrice) {
+          return false;
+        }
 
-    // Search Query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.brand.toLowerCase().includes(q) ||
-          item.locality.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q)
-      );
-    }
+        // Near Me Radius Filter
+        if (isNearMeActive && userCoords && item.lat && item.lng) {
+          const distance = calculateDistanceKm(
+            userCoords.lat,
+            userCoords.lng,
+            item.lat,
+            item.lng
+          );
+          if (distance > selectedRadiusKm) {
+            return false;
+          }
+        }
 
-    // Sorting
-    list.sort((a, b) => {
-      if (sortBy === 'distance') {
-        return a.distanceKm - b.distanceKm;
-      }
-      if (sortBy === 'price_asc') {
-        return a.monthlyRent - b.monthlyRent;
-      }
-      if (sortBy === 'price_desc') {
-        return b.monthlyRent - a.monthlyRent;
-      }
-      if (sortBy === 'rating') {
-        return b.owner.rating - a.owner.rating;
-      }
-      return 0;
-    });
-
-    return list;
+        return true;
+      })
+      .map((item) => {
+        if (isNearMeActive && userCoords && item.lat && item.lng) {
+          const distance = calculateDistanceKm(
+            userCoords.lat,
+            userCoords.lng,
+            item.lat,
+            item.lng
+          );
+          return { ...item, distanceKm: distance };
+        }
+        return item;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'distance') {
+          return (a.distanceKm || 99) - (b.distanceKm || 99);
+        }
+        if (sortBy === 'price_asc') {
+          return a.dailyRent - b.dailyRent;
+        }
+        if (sortBy === 'price_desc') {
+          return b.dailyRent - a.dailyRent;
+        }
+        if (sortBy === 'rating') {
+          return b.owner.rating - a.owner.rating;
+        }
+        return 0;
+      });
   }, [
     equipmentList,
-    selectedCategory,
     selectedCity,
+    selectedCategory,
+    searchQuery,
     sanitizedOnly,
     instantOnly,
     maxPrice,
-    searchQuery,
+    isNearMeActive,
     userCoords,
     selectedRadiusKm,
     sortBy,
@@ -255,30 +283,54 @@ export default function HomePage() {
 
   const handleResetFilters = () => {
     setSelectedCategory('ALL');
-    setSelectedCity('Delhi NCR');
     setSearchQuery('');
     setSanitizedOnly(false);
     setInstantOnly(false);
     setMaxPrice(15000);
-    setSelectedRadiusKm(25);
-    setSortBy('distance');
     setIsNearMeActive(false);
+    setSortBy('distance');
   };
 
   const handleListingCreated = (newListing: EquipmentItem) => {
     setEquipmentList((prev) => [newListing, ...prev]);
     setRecentBookingToast({
-      title: 'Listing Published Successfully!',
-      message: `${newListing.title} is now active and discoverable by patients in ${newListing.city}.`,
+      title: 'Listing Submitted (Status: PENDING)',
+      message: `${newListing.title} submitted. Admin will review purchase invoice & approve.`,
     });
     setTimeout(() => setRecentBookingToast(null), 6000);
   };
 
+  const handleToggleListingStatus = (id: string) => {
+    setEquipmentList((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, status: item.status === 'Live' ? 'Paused' : 'Live' }
+          : item
+      )
+    );
+  };
+
   const handleBookingComplete = (booking: CompletedBooking) => {
     setUserBookings((prev) => [booking, ...prev]);
+    // Lock dates for that equipment
+    setEquipmentList((prev) =>
+      prev.map((item) => {
+        if (item.id === booking.equipment.id) {
+          return {
+            ...item,
+            status: 'Booked',
+            bookedDates: [
+              ...(item.bookedDates || []),
+              { start: booking.startDate, end: booking.endDate, orderId: booking.bookingId }
+            ]
+          };
+        }
+        return item;
+      })
+    );
     setRecentBookingToast({
       title: `Booking Confirmed: ${booking.bookingId}`,
-      message: `Deposit of ₹${booking.financials.securityDeposit.toLocaleString('en-IN')} held in Escrow. Porter dispatched.`,
+      message: `Deposit of ₹${booking.financials.refundableDeposit} held in Escrow. Courier dispatched.`,
     });
     setTimeout(() => setRecentBookingToast(null), 8000);
   };
@@ -308,19 +360,18 @@ export default function HomePage() {
         if (b.bookingId === bookingId) {
           return {
             ...b,
-            orderStatus: 'COMPLETED_REFUNDED',
+            orderStatus: 'Completed',
           };
         }
         return b;
       })
     );
     setRecentBookingToast({
-      title: 'Deposit Refund Credited!',
-      message: `₹10,000 security deposit has been refunded back to your original payment account.`,
+      title: 'Step 10 & 11: Return Scheduled!',
+      message: `Courier partner assigned for pickup. Deposit will be refunded after inspection.`,
     });
     setTimeout(() => setRecentBookingToast(null), 7000);
   };
-
 
   const scrollToCatalog = () => {
     const el = document.getElementById('catalog-section');
@@ -331,6 +382,7 @@ export default function HomePage() {
     <AuthProvider>
       <CartProvider>
       <div className="min-h-screen flex flex-col bg-[#F8FAFC] overflow-x-hidden w-full">
+      
       {/* Toast Notification */}
       {recentBookingToast && (
         <div className="fixed bottom-6 right-6 z-50 max-w-sm p-4 bg-[#0B192C] text-white rounded-2xl shadow-2xl border border-cyan-500/40 animate-in slide-in-from-bottom-5 duration-300">
@@ -357,10 +409,12 @@ export default function HomePage() {
         selectedCity={selectedCity}
         onOpenLocationModal={() => setIsLocationModalOpen(true)}
         onOpenListingWizard={() => setIsListingWizardOpen(true)}
+        onOpenOwnerHub={() => setIsOwnerHubOpen(true)}
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenMyRentals={() => setIsMyRentalsOpen(true)}
         onOpenQuery={() => setIsQueryModalOpen(true)}
-        activeBookingsCount={userBookings.filter((b) => b.orderStatus !== 'COMPLETED_REFUNDED').length}
+        onOpenPlainEnglishGuide={() => setIsPlainEnglishGuideOpen(true)}
+        activeBookingsCount={userBookings.filter((b) => b.orderStatus !== 'Completed').length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onOpenCart={() => setIsCartOpen(true)}
@@ -371,35 +425,40 @@ export default function HomePage() {
         onOpenListingWizard={() => setIsListingWizardOpen(true)}
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenPrescription={() => setIsPrescriptionModalOpen(true)}
+        onOpenPlainEnglishGuide={() => setIsPlainEnglishGuideOpen(true)}
         selectedCity={selectedCity}
       />
 
       {/* Main Discovery Container */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        
         {/* RentoMojo-style Visual Top Categories Showcase */}
         <ExploreCategories
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
           onOpenPrescription={() => setIsPrescriptionModalOpen(true)}
         />
+
         {/* Category & Quick Filter Bar with Location Tracker */}
-        <CategoryFilter
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-          sanitizedOnly={sanitizedOnly}
-          onToggleSanitized={() => setSanitizedOnly(!sanitizedOnly)}
-          instantOnly={instantOnly}
-          onToggleInstant={() => setInstantOnly(!instantOnly)}
-          maxPrice={maxPrice}
-          onMaxPriceChange={setMaxPrice}
-          isNearMeActive={isNearMeActive}
-          onToggleNearMe={handleToggleNearMe}
-          selectedRadiusKm={selectedRadiusKm}
-          onSelectRadiusKm={setSelectedRadiusKm}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          detectedLocalityName={detectedLocalityName}
-        />
+        <div id="catalog-section">
+          <CategoryFilter
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            sanitizedOnly={sanitizedOnly}
+            onToggleSanitized={() => setSanitizedOnly(!sanitizedOnly)}
+            instantOnly={instantOnly}
+            onToggleInstant={() => setInstantOnly(!instantOnly)}
+            maxPrice={maxPrice}
+            onMaxPriceChange={setMaxPrice}
+            isNearMeActive={isNearMeActive}
+            onToggleNearMe={handleToggleNearMe}
+            selectedRadiusKm={selectedRadiusKm}
+            onSelectRadiusKm={setSelectedRadiusKm}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            detectedLocalityName={detectedLocalityName}
+          />
+        </div>
 
         {/* Equipment Catalog Grid */}
         <EquipmentGrid
@@ -413,12 +472,35 @@ export default function HomePage() {
         {/* Doctor & Patient Stories */}
         <DoctorEndorsements />
 
-        {/* How It Works & Trust Pillars */}
-        <HowItWorksSection />
+        {/* How It Works & Trust Pillars (Guide Master Flow) */}
+        <HowItWorksSection onOpenGuide={() => setIsPlainEnglishGuideOpen(true)} />
 
         {/* Frequently Asked Questions */}
         <FaqSection />
       </main>
+
+      {/* Plain-English Guide Complete Interactive Modal */}
+      <PlainEnglishGuideModal
+        isOpen={isPlainEnglishGuideOpen}
+        onClose={() => setIsPlainEnglishGuideOpen(false)}
+        onOpenOwnerDashboard={() => setIsOwnerHubOpen(true)}
+        onOpenBuyerDashboard={() => setIsMyRentalsOpen(true)}
+        onOpenAdminDashboard={() => {
+          window.location.href = '/admin';
+        }}
+      />
+
+      {/* Owner Hub (Lister Dashboard) */}
+      <LenderHubModal
+        isOpen={isOwnerHubOpen}
+        onClose={() => setIsOwnerHubOpen(false)}
+        myListings={equipmentList}
+        onToggleListingStatus={handleToggleListingStatus}
+        onOpenNewListing={() => {
+          setIsOwnerHubOpen(false);
+          setIsListingWizardOpen(true);
+        }}
+      />
 
       {/* Quick View Modal */}
       <QuickViewModal
@@ -436,8 +518,10 @@ export default function HomePage() {
         onClose={() => setIsCartOpen(false)}
         onCheckout={() => {
           setIsCartOpen(false);
-          // Open checkout with first cart item
-          setIsCheckoutOpen(true);
+          if (filteredEquipment.length > 0) {
+            setCheckoutProduct(filteredEquipment[0]);
+            setIsCheckoutOpen(true);
+          }
         }}
       />
 
@@ -463,7 +547,7 @@ export default function HomePage() {
         onBookingComplete={handleBookingComplete}
       />
 
-      {/* My Rentals & Order Tracker Modal */}
+      {/* Buyer Dashboard (My Rentals & Order Tracker Modal) */}
       <MyRentalsModal
         isOpen={isMyRentalsOpen}
         onClose={() => setIsMyRentalsOpen(false)}
@@ -472,7 +556,7 @@ export default function HomePage() {
         onReturnBooking={handleReturnBooking}
       />
 
-      {/* Listing Wizard Modal */}
+      {/* Owner Listing Wizard Modal */}
       <ListingWizardModal
         isOpen={isListingWizardOpen}
         onClose={() => setIsListingWizardOpen(false)}
@@ -504,7 +588,7 @@ export default function HomePage() {
       {/* Google Authentication Modal */}
       <GoogleAuthModal />
 
-      {/* RentoMojo-style Location Modal */}
+      {/* Location Modal */}
       <LocationModal
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}

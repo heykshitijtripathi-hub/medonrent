@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { listingsDatabase } from '@/app/api/_data/listingsDatabase';
 
 interface BookingRecord {
   bookingId: string;
@@ -8,6 +9,8 @@ interface BookingRecord {
   renterPhone: string;
   deliveryAddress: string;
   durationDays: number;
+  startDate: string; // ISO start date of rental
+  endDate: string; // ISO end date of rental (computed)
   financials: {
     baseRent: number;
     securityDeposit: number;
@@ -39,26 +42,60 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    // Expected fields from client
     const {
       listingId,
+      startDate,
+      durationDays,
+      baseRent,
+      securityDeposit,
+      includeConsumables = false,
       equipmentTitle,
-      baseRent = 5800,
-      securityDeposit = 10000,
-      durationDays = 30,
-      includeConsumables = true,
-      renterName = 'Patient Family',
-      renterPhone = '+91 98101 23456',
-      deliveryAddress = 'Flat 502, DLF Phase 1, Gurugram',
-    } = body;
+      renterName,
+      renterPhone,
+      deliveryAddress,
+    } = body as {
+      listingId: string;
+      startDate: string;
+      durationDays: number;
+      baseRent: number;
+      securityDeposit: number;
+      includeConsumables?: boolean;
+      equipmentTitle?: string;
+      renterName: string;
+      renterPhone: string;
+      deliveryAddress: string;
+    };
+
+    // Compute end date of rental period
+    const endDate = new Date(new Date(startDate).getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+    // Validate listing existence
+    const listing = listingsDatabase.find((l) => l.id === listingId);
+    if (!listing) {
+      return NextResponse.json({ success: false, error: 'Listing not found' }, { status: 404 });
+    }
+
+    // Double‑booking guard: ensure requested period does not overlap existing bookings
+    const overlap = listing.bookedDates?.some((range) => {
+      const existingStart = new Date(range.start);
+      const existingEnd = new Date(range.end);
+      const reqStart = new Date(startDate);
+      const reqEnd = new Date(endDate);
+      return reqStart <= existingEnd && reqEnd >= existingStart;
+    });
+    if (overlap) {
+      return NextResponse.json({ success: false, error: 'Selected dates overlap with an existing booking' }, { status: 400 });
+    }
 
     const consumablesAddon = includeConsumables ? 199 : 0;
     const porterDelivery = 350;
     const rentTotal = Number(baseRent);
     const depositTotal = Number(securityDeposit);
 
-    // MedOnRent Commission Formula: 18% of rent
-    const platformCommission = Math.round(rentTotal * 0.18);
-    const lenderPayout = Math.round(rentTotal * 0.82);
+    // MedOnRent Commission Formula: 15% of rent
+    const platformCommission = Math.round(rentTotal * 0.15);
+    const lenderPayout = Math.round(rentTotal * 0.85);
     const totalAmountCharged = rentTotal + depositTotal + consumablesAddon + porterDelivery;
 
     const randomBookingNum = `MOR-2026-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -73,6 +110,8 @@ export async function POST(request: Request) {
       renterPhone,
       deliveryAddress,
       durationDays,
+      startDate,
+      endDate,
       financials: {
         baseRent: rentTotal,
         securityDeposit: depositTotal,
@@ -90,7 +129,16 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    activeBookings.unshift(newBooking);
+    // Append booked date range to the listing
+    if (listing) {
+      listing.bookedDates = listing.bookedDates || [];
+      listing.bookedDates.push({
+        start: startDate,
+        end: endDate,
+        orderId: randomBookingNum,
+        renterName: renterName,
+      });
+    }
 
     return NextResponse.json(
       {

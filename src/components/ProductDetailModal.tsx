@@ -11,7 +11,9 @@ import {
   Play, 
   Pause, 
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  FileText,
+  Truck
 } from 'lucide-react';
 import { EquipmentItem } from '@/data/initialEquipment';
 
@@ -26,20 +28,23 @@ export default function ProductDetailModal({
   onClose,
   onProceedToCheckout,
 }: ProductDetailModalProps) {
-  const [tenureDays, setTenureDays] = useState<number>(30);
-  const [includeConsumables, setIncludeConsumables] = useState<boolean>(true);
-  const [includePorter, setIncludePorter] = useState<boolean>(true);
+  // Guide default is 5-day rental worked example (Page 8)
+  const [tenureDays, setTenureDays] = useState<number>(5);
   const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
   const [videoProgress, setVideoProgress] = useState<number>(0);
 
   if (!item) return null;
 
-  // RentoMojo-style tenure pricing with transparent savings
-  const multiplier = tenureDays === 15 ? 0.6 : tenureDays === 30 ? 1.0 : tenureDays === 60 ? 1.85 : 2.65;
-  const calculatedRent = Math.round(item.monthlyRent * multiplier);
-  const consumablesFee = includeConsumables ? 199 : 0;
-  const porterFee = includePorter ? 350 : 0;
-  const totalDueNow = calculatedRent + item.securityDeposit + consumablesFee + porterFee;
+  // Pricing from Guide:
+  const ownerDaily = item.ownerPricePerDay || Math.round(item.monthlyRent / 30 * 0.85);
+  const commissionPct = item.commissionPercent || 15;
+  const commissionDaily = Math.round(ownerDaily * (commissionPct / 100));
+  const buyerDaily = item.dailyRent || (ownerDaily + commissionDaily);
+
+  const calculatedRent = buyerDaily * tenureDays;
+  const refundableDeposit = item.securityDeposit || 2000;
+  const deliveryFee = 150; // Standard courier fee from Guide Page 8
+  const totalDueNow = calculatedRent + refundableDeposit + deliveryFee;
 
   // Video playback simulation
   const toggleVideo = () => {
@@ -68,7 +73,7 @@ export default function ProductDetailModal({
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] inline-block"></span>
             <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate max-w-[240px] sm:max-w-none">
-              Verified Medical Equipment • Doorstep Handover
+              Plain-English Guide Verified • Doorstep Courier Handover
             </span>
           </div>
           <button
@@ -134,9 +139,9 @@ export default function ProductDetailModal({
                 <div className="flex items-center justify-between text-[11px] text-emerald-300 font-medium bg-emerald-950/80 backdrop-blur-md p-2 rounded-xl border border-emerald-500/30">
                   <span className="flex items-center">
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-400" />
-                    Operating at standard medical parameters • 0 Fault codes
+                    Verified Working Parameter Check • 0 Fault Codes
                   </span>
-                  <span className="text-slate-300">Verified</span>
+                  <span className="text-slate-300">Clean</span>
                 </div>
               </div>
             </div>
@@ -156,23 +161,21 @@ export default function ProductDetailModal({
               </p>
             </div>
 
-            {/* Sanitization Protocol Box */}
-            <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-start space-x-3.5">
-              <div className="p-2 rounded-xl bg-emerald-600 text-white flex-shrink-0">
-                <Sparkles className="w-5 h-5" />
+            {/* Guide Trust & Safety Verification Badges */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center space-x-2">
+                <FileText className="w-4 h-4 text-[#007791] shrink-0" />
+                <div>
+                  <span className="font-bold text-slate-800 block text-[11px]">Purchase Invoice</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold">✓ Admin Verified</span>
+                </div>
               </div>
-              <div className="text-xs">
-                <h4 className="font-bold text-emerald-950 flex items-center gap-1.5">
-                  <span>Hospital-Grade Sanitization Protocol</span>
-                  <span className="bg-emerald-200/80 text-emerald-900 text-[10px] px-1.5 py-0.5 rounded font-bold">
-                    Certified Clean
-                  </span>
-                </h4>
-                <p className="text-emerald-800 mt-0.5 leading-relaxed">
-                  Treated with 70% Isopropyl medical solution. All outer surfaces disinfected. Brand new sealed patient consumables required for zero cross-contamination.
-                </p>
-                <div className="text-[11px] text-emerald-700 font-semibold mt-1.5">
-                  Certified Clean: {item.sanitizationDate}
+
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div>
+                  <span className="font-bold text-slate-800 block text-[11px]">Hygiene Sanitization</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold">✓ Hospital Grade Certified</span>
                 </div>
               </div>
             </div>
@@ -204,7 +207,7 @@ export default function ProductDetailModal({
                     {item.owner.isAadhaarVerified && (
                       <span className="bg-[#10B981]/15 text-[#059669] text-[10px] font-bold px-1.5 py-0.5 rounded inline-flex items-center">
                         <ShieldCheck className="w-3 h-3 mr-0.5" />
-                        Aadhaar Verified Owner
+                        ID Verified
                       </span>
                     )}
                   </div>
@@ -218,7 +221,7 @@ export default function ProductDetailModal({
             </div>
           </div>
 
-          {/* Right Column: RentoMojo-style Clean Price Breakdown & Checkout (5 cols) */}
+          {/* Right Column: Guide-Aligned Price Calculator & Checkout (5 cols) */}
           <div className="lg:col-span-5 bg-slate-50/70 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
@@ -226,18 +229,18 @@ export default function ProductDetailModal({
                   Select Rental Duration
                 </span>
                 <span className="text-xs font-black text-[#007791]">
-                  100% Refundable Deposit
+                  ₹{buyerDaily} / day
                 </span>
               </div>
 
-              {/* RentoMojo-style Duration Tabs with Discount Badges */}
-              <div className="mb-5">
+              {/* Duration Tabs (Including Guide's 5-Day Worked Example) */}
+              <div className="mb-4">
                 <div className="grid grid-cols-4 gap-1.5">
                   {[
-                    { days: 15, label: '15 Days', discount: '' },
-                    { days: 30, label: '1 Month', discount: 'Popular' },
-                    { days: 60, label: '2 Months', discount: 'Save 10%' },
-                    { days: 90, label: '3 Months', discount: 'Save 15%' },
+                    { days: 5, label: '5 Days', tag: 'Guide' },
+                    { days: 10, label: '10 Days', tag: '' },
+                    { days: 15, label: '15 Days', tag: '' },
+                    { days: 30, label: '30 Days', tag: 'Best Rate' },
                   ].map((plan) => (
                     <button
                       key={plan.days}
@@ -249,13 +252,13 @@ export default function ProductDetailModal({
                       }`}
                     >
                       <div>{plan.label}</div>
-                      {plan.discount && (
+                      {plan.tag && (
                         <div
                           className={`text-[9px] font-bold block ${
-                            tenureDays === plan.days ? 'text-emerald-300' : 'text-[#007791]'
+                            tenureDays === plan.days ? 'text-cyan-200' : 'text-[#007791]'
                           }`}
                         >
-                          {plan.discount}
+                          {plan.tag}
                         </div>
                       )}
                     </button>
@@ -263,60 +266,16 @@ export default function ProductDetailModal({
                 </div>
               </div>
 
-              {/* Add-ons Checklist */}
-              <div className="space-y-2.5 mb-5">
-                <label
-                  className={`flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                    includeConsumables
-                      ? 'bg-cyan-50/50 border-cyan-300'
-                      : 'bg-white border-slate-200'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={includeConsumables}
-                    onChange={(e) => setIncludeConsumables(e.target.checked)}
-                    className="mt-0.5 rounded text-[#007791]"
-                  />
-                  <div className="text-xs">
-                    <span className="font-bold text-slate-800 block">
-                      Brand New Sealed Accessories Kit (+₹199)
-                    </span>
-                    <span className="text-slate-500 text-[11px]">
-                      New sterile mask, nasal cannula, and filter tube (yours to keep).
-                    </span>
-                  </div>
-                </label>
+              {/* Pricing Breakdown (Exact Guide Page 8 Table) */}
+              <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm space-y-2.5 text-xs mb-5">
+                <div className="text-[10px] font-bold uppercase text-slate-400 pb-1 border-b border-slate-100 flex justify-between">
+                  <span>Plain-English Split</span>
+                  <span>Owner ₹{ownerDaily} + Admin 15% ₹{commissionDaily}</span>
+                </div>
 
-                <label
-                  className={`flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                    includePorter
-                      ? 'bg-cyan-50/50 border-cyan-300'
-                      : 'bg-white border-slate-200'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={includePorter}
-                    onChange={(e) => setIncludePorter(e.target.checked)}
-                    className="mt-0.5 rounded text-[#007791]"
-                  />
-                  <div className="text-xs">
-                    <span className="font-bold text-slate-800 block">
-                      Doorstep Porter Delivery & Return Pickup (+₹350)
-                    </span>
-                    <span className="text-slate-500 text-[11px]">
-                      2-way safe handling directly to patient bed.
-                    </span>
-                  </div>
-                </label>
-              </div>
-
-              {/* RentoMojo Clean Price Breakdown (NO UNPROFESSIONAL MARGINS) */}
-              <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm space-y-2 text-xs mb-5">
                 <div className="flex items-center justify-between text-slate-600">
-                  <span>Rental Fee ({tenureDays} days):</span>
-                  <span className="font-bold text-slate-900">₹{calculatedRent.toLocaleString('en-IN')}</span>
+                  <span>Rent ({tenureDays} days @ ₹{buyerDaily}/day):</span>
+                  <span className="font-bold text-slate-900 font-mono">₹{calculatedRent}</span>
                 </div>
 
                 <div className="flex items-center justify-between text-slate-600">
@@ -324,53 +283,40 @@ export default function ProductDetailModal({
                     <Lock className="w-3.5 h-3.5 text-emerald-600 mr-1" />
                     Refundable Security Deposit:
                   </span>
-                  <span className="font-bold text-emerald-700">₹{item.securityDeposit.toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-emerald-700 font-mono">₹{refundableDeposit}</span>
                 </div>
 
-                {includeConsumables && (
-                  <div className="flex items-center justify-between text-slate-600">
-                    <span>New Sterile Accessories:</span>
-                    <span className="font-semibold text-slate-900">₹199</span>
-                  </div>
-                )}
-
-                {includePorter && (
-                  <div className="flex items-center justify-between text-slate-600">
-                    <span>Doorstep Delivery via Porter:</span>
-                    <span className="font-semibold text-slate-900">₹350</span>
-                  </div>
-                )}
+                <div className="flex items-center justify-between text-slate-600">
+                  <span className="flex items-center">
+                    <Truck className="w-3.5 h-3.5 text-slate-400 mr-1" />
+                    Doorstep Courier Delivery Fee:
+                  </span>
+                  <span className="font-bold text-slate-900 font-mono">₹{deliveryFee}</span>
+                </div>
 
                 <div className="pt-2.5 border-t border-slate-200 flex items-baseline justify-between">
                   <div>
-                    <span className="font-extrabold text-sm text-slate-900">Total Payable Now:</span>
+                    <span className="font-black text-sm text-slate-900">Total Payable:</span>
                     <span className="block text-[10px] text-emerald-600 font-semibold">
-                      (Includes ₹{item.securityDeposit.toLocaleString('en-IN')} 100% refundable deposit)
+                      (Includes ₹{refundableDeposit} 100% refundable deposit)
                     </span>
                   </div>
-                  <span className="text-lg font-black text-slate-900">
-                    ₹{totalDueNow.toLocaleString('en-IN')}
+                  <span className="text-lg font-black text-slate-900 font-mono">
+                    ₹{totalDueNow}
                   </span>
                 </div>
               </div>
 
-              {/* RentoMojo-style Trust & Assurance Box */}
+              {/* Plain-English Escrow Safeguards */}
               <div className="p-3 rounded-xl bg-slate-100 text-[11px] text-slate-600 space-y-1.5 mb-5 border border-slate-200/80">
                 <div className="font-bold text-slate-800 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>MedOnRent Assurance & Guarantees</span>
+                  <span>Plain-English Escrow Safeguards</span>
                 </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span>• 100% Refundable Deposit Returned on Handover</span>
-                  <span className="text-emerald-700 font-bold">Guaranteed</span>
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span>• Free Replacement if Machine Faults</span>
-                  <span className="text-emerald-700 font-bold">24x7 Support</span>
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span>• Extend or Return Anytime with 1-Click</span>
-                  <span className="text-emerald-700 font-bold">Flexible</span>
+                <div className="text-[10px] text-slate-600">
+                  • Deposit refunded immediately following return inspection.<br />
+                  • Owner payout released once return clearance is confirmed.<br />
+                  • Strict calendar lock prevents double booking.
                 </div>
               </div>
             </div>
@@ -381,12 +327,9 @@ export default function ProductDetailModal({
                 onClick={() => onProceedToCheckout(item, tenureDays)}
                 className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#007791] to-[#10B981] hover:from-[#005F73] hover:to-[#059669] text-white font-bold text-xs shadow-md flex items-center justify-center space-x-2 transition-all active:scale-[0.98]"
               >
-                <span>Book Now & Enter Delivery Address</span>
+                <span>Book for {tenureDays} Days (₹{totalDueNow})</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
-              <p className="text-[10px] text-center text-slate-400 mt-2">
-                Deposit is securely locked until safe return of the machine.
-              </p>
             </div>
           </div>
         </div>

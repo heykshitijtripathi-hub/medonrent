@@ -126,7 +126,11 @@ export default function Footer() {
               </div>
               <div className="flex items-center space-x-2 text-slate-400 text-[11px]">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>UIDAI Aadhaar Verified Peer Verification</span>
+                <div className="flex items-center space-x-2 text-slate-400 mt-2">
+  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+  <span>UIDAI Aadhaar Verified Peer Verification</span>
+  <a href="/admin" className="ml-2 hover:underline text-sky-400">Admin Control Center</a>
+</div>
               </div>
             </div>
           </div>

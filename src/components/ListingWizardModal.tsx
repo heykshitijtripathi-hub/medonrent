@@ -3,14 +3,11 @@
 import React, { useState } from 'react';
 import { 
   X, 
-  Video, 
-  Calculator, 
-  Building2, 
-  Sparkles, 
-  ShieldCheck, 
   ArrowRight, 
   ArrowLeft,
-  CheckCircle2
+  CheckCircle2,
+  FileText,
+  UserCheck
 } from 'lucide-react';
 import { EquipmentItem } from '@/data/initialEquipment';
 
@@ -28,83 +25,127 @@ export default function ListingWizardModal({
   const [step, setStep] = useState<number>(1);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // Form State
+  // Form State aligned with Guide Section 3 & 16
   const [formData, setFormData] = useState({
-    category: 'RESPIRATORY',
+    // Step 1: Owner Profile & Bank Payout Details
+    ownerName: 'Dr. Rajiv Malhotra',
+    ownerPhone: '+91 98112 34567',
+    idType: 'Aadhaar Card',
+    idNumber: '•••• •••• 9102',
+    bankAccount: '1092837465',
+    bankIfsc: 'HDFC0001042',
+    bankName: 'HDFC Bank, Gurugram Branch',
+    
+    // Step 2: Equipment & Purchase Invoice
+    category: 'RESPIRATORY' as "RESPIRATORY" | "HOME_ICU" | "MOBILITY" | "MONITORING",
     title: 'Philips EverFlo 5L Concentrator',
     brand: 'Philips Respironics',
     modelNumber: 'EverFlo-2024',
-    originalPrice: 55000,
-    monthlyRent: 5800,
-    securityDeposit: 10000,
+    condition: 'Like New' as "Like New" | "Gently Used" | "Certified Refurbished",
+    description: 'Pristine medical condition, single patient use during recovery. All filters replaced with new OEM filter. Hospital-grade sanitized.',
+    purchaseInvoiceName: 'Original_GST_Invoice_Philips_Everflo.pdf',
+    invoiceVerified: false,
+    
+    // Step 3: Daily Price & Refundable Security Deposit
+    ownerPricePerDay: 500, // Worked example from Guide
+    securityDeposit: 2000, // Worked example from Guide
     city: 'Delhi NCR',
     locality: 'Sector 54, Gurugram',
-    ownerName: 'Dr. Rajiv Malhotra',
-    ownerPhone: '+91 98112 34567',
-    bankAccount: '1092837465',
-    bankIfsc: 'HDFC0001042',
-    description: 'Pristine medical condition, single patient use during recovery. All filters replaced with new OEM filter.',
-    condition: 'Like New',
-    videoUploaded: true,
+    commissionPercent: 15,
   });
 
   if (!isOpen) return null;
 
-  // Smart Pricing Engine: suggests rent at ~10-12% of retail price, deposit at ~18%
-  const handleOriginalPriceChange = (price: number) => {
-    const suggestedRent = Math.round((price * 0.11) / 100) * 100;
-    const suggestedDeposit = Math.round((price * 0.18) / 100) * 100;
-    setFormData((prev) => ({
-      ...prev,
-      originalPrice: price,
-      monthlyRent: suggestedRent,
-      securityDeposit: suggestedDeposit,
-    }));
-  };
+  // Real-time Guide calculations
+  const commissionDaily = Math.round(formData.ownerPricePerDay * (formData.commissionPercent / 100));
+  const buyerDailyPrice = formData.ownerPricePerDay + commissionDaily;
 
   const handleNext = () => setStep((s) => Math.min(s + 1, 4));
   const handleBack = () => setStep((s) => Math.max(s - 1, 1));
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    try {
-      const response = await fetch('/api/listings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (data.success) {
-        onListingCreated(data.listing);
-        onClose();
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    
+    // Simulate API submission
+    setTimeout(() => {
+      const newListing: EquipmentItem = {
+        id: `mor-lister-${Date.now().toString().slice(-4)}`,
+        title: formData.title,
+        brand: formData.brand,
+        category: formData.category,
+        categoryLabel: formData.category === 'RESPIRATORY' ? 'Respiratory Care' : formData.category === 'HOME_ICU' ? 'Home ICU & Recovery' : 'Mobility & Rehab',
+        ownerPricePerDay: formData.ownerPricePerDay,
+        commissionPercent: formData.commissionPercent,
+        dailyRent: buyerDailyPrice,
+        monthlyRent: Math.round(buyerDailyPrice * 30 * 0.75), // Discounted 30-day rate
+        securityDeposit: formData.securityDeposit,
+        originalPrice: formData.ownerPricePerDay * 100,
+        description: formData.description,
+        condition: formData.condition,
+        specs: {
+          "Condition": formData.condition,
+          "Brand": formData.brand,
+          "Model": formData.modelNumber,
+          "Inspection Certificate": "Attached",
+        },
+        image: "/equipment/oxygen-concentrator.jpg",
+        videoDurationSec: 5,
+        hasWorkingProofVideo: true,
+        isSanitized: true,
+        sanitizationDate: "Today (Hospital Grade)",
+        city: formData.city,
+        locality: formData.locality,
+        distanceKm: 3.2,
+        owner: {
+          id: `own_${Date.now().toString().slice(-3)}`,
+          name: formData.ownerName,
+          roleDesc: "Resident & Lister",
+          isAadhaarVerified: true,
+          rating: 5.0,
+          completedRentals: 0,
+          responseTime: "< 15 mins",
+          bankAccount: formData.bankAccount,
+          bankIfsc: formData.bankIfsc
+        },
+        features: [
+          "Original GST invoice attached",
+          "Sanitized with hospital-grade disinfectant",
+          "Power cords and accessories included"
+        ],
+        instantDispatch: false,
+        isAvailable: false,
+        status: 'Pending approval', // Guide Step 4: Status PENDING waiting for admin
+        purchaseInvoiceVerified: false,
+        purchaseInvoiceUrl: formData.purchaseInvoiceName,
+        requiresPrescription: formData.category === 'RESPIRATORY',
+        bookedDates: []
+      };
 
-  const netOwnerPayout = Math.round(formData.monthlyRent * 0.82);
+      onListingCreated(newListing);
+      setSubmitting(false);
+      onClose();
+    }, 1200);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 flex flex-col">
+        
         {/* Header with Step indicator */}
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[#007791]">
-                List Equipment & Earn
+                Owner (Lister) Journey • Section 3 of Guide
               </span>
               <span className="text-xs text-slate-400">•</span>
               <span className="text-xs font-semibold text-slate-600">Step {step} of 4</span>
             </div>
             <h2 className="text-base font-bold text-slate-900 mt-0.5">
-              {step === 1 && '1. Equipment Brand & Specifications'}
-              {step === 2 && '2. 5-Second Proof-of-Life Video Verification'}
-              {step === 3 && '3. Set Monthly Rent & Security Deposit'}
-              {step === 4 && '4. Handover Address & Payout Bank Account'}
+              {step === 1 && '1. Owner Registration, ID Verification & Bank Details'}
+              {step === 2 && '2. Equipment Details & Mandatory Purchase Invoice'}
+              {step === 3 && '3. Set Daily Rental Price & Refundable Security Deposit'}
+              {step === 4 && '4. Review & Submit for Admin Approval (Status PENDING)'}
             </h2>
           </div>
           <button
@@ -118,27 +159,110 @@ export default function ListingWizardModal({
         {/* Progress Bar */}
         <div className="w-full bg-slate-100 h-1.5">
           <div
-            className="h-full bg-gradient-to-r from-[#007791] to-[#10B981] transition-all duration-300"
+            className="h-full bg-gradient-to-r from-amber-500 to-[#007791] transition-all duration-300"
             style={{ width: `${(step / 4) * 100}%` }}
           ></div>
         </div>
 
         {/* Step Contents */}
-        <div className="p-6 overflow-y-auto max-h-[70vh]">
-          {/* STEP 1 */}
+        <div className="p-6 overflow-y-auto max-h-[70vh] text-xs space-y-4">
+
+          {/* STEP 1: OWNER ID & BANK DETAILS */}
           {step === 1 && (
-            <div className="space-y-4 text-xs">
+            <div className="space-y-4">
+              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start space-x-2.5">
+                <UserCheck className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-amber-950 text-xs">Why ID & Bank Details are Required (Guide Page 3):</h4>
+                  <p className="text-[11px] text-amber-800 mt-0.5">
+                    1. The owner signs up and confirms their phone with a one-time code.<br />
+                    2. The owner uploads an ID document and bank details. The bank details are needed to transfer your earnings directly after return inspection.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Full Legal Name</label>
+                  <input
+                    type="text"
+                    value={formData.ownerName}
+                    onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Mobile Phone (OTP Verified)</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.ownerPhone}
+                      onChange={(e) => setFormData({ ...formData, ownerPhone: e.target.value })}
+                      className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30 font-mono"
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      ✓ Phone Verified
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                <span className="font-bold text-slate-800 block">Government ID Document Verification:</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-2 bg-white rounded-lg border border-slate-200">
+                    <span className="text-[10px] text-slate-400 font-bold block">Document Type</span>
+                    <span className="font-semibold text-slate-800">{formData.idType}</span>
+                  </div>
+                  <div className="p-2 bg-white rounded-lg border border-slate-200">
+                    <span className="text-[10px] text-slate-400 font-bold block">Status</span>
+                    <span className="font-bold text-emerald-700 flex items-center space-x-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Uploaded & Verified</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <span className="font-bold text-slate-800 block">Bank Account for Automatic Payouts:</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-500 mb-1">Account Number</label>
+                    <input
+                      type="text"
+                      value={formData.bankAccount}
+                      onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
+                      className="w-full p-2.5 rounded-xl border border-slate-200 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 mb-1">IFSC Code</label>
+                    <input
+                      type="text"
+                      value={formData.bankIfsc}
+                      onChange={(e) => setFormData({ ...formData, bankIfsc: e.target.value })}
+                      className="w-full p-2.5 rounded-xl border border-slate-200 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: EQUIPMENT & INVOICE */}
+          {step === 2 && (
+            <div className="space-y-4">
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">Equipment Category</label>
                 <select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-medium focus:ring-2 focus:ring-[#007791]/30 focus:border-[#007791]"
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value as "RESPIRATORY" | "HOME_ICU" | "MOBILITY" | "MONITORING" })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-medium"
                 >
                   <option value="RESPIRATORY">Respiratory Care (Oxygen Concentrator, BiPAP, CPAP)</option>
-                  <option value="HOME_ICU">Home ICU (Motorized Bed, Anti-Bedsore Mattress)</option>
-                  <option value="MOBILITY">Mobility & Rehab (Wheelchair, Rollator, Crutches)</option>
-                  <option value="MONITORING">Patient Monitoring (Vital Monitors, Infusion Pumps)</option>
+                  <option value="HOME_ICU">Home ICU (Motorized ICU Bed, Anti-Bedsore Mattress)</option>
+                  <option value="MOBILITY">Mobility & Rehabilitation (Powered Wheelchair, Walker)</option>
                 </select>
               </div>
 
@@ -149,242 +273,160 @@ export default function ListingWizardModal({
                     type="text"
                     value={formData.brand}
                     onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                    placeholder="e.g. Philips, ResMed, Karma"
-                    className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30"
+                    className="w-full p-2.5 rounded-xl border border-slate-200"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Model / Specs</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Listing Title</label>
                   <input
                     type="text"
-                    value={formData.modelNumber}
-                    onChange={(e) => setFormData({ ...formData, modelNumber: e.target.value })}
-                    placeholder="e.g. EverFlo 5L with OPI"
-                    className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Product Condition</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { val: 'Like New', label: 'Brand New', desc: 'Flawless condition' },
-                    { val: 'Gently Used', label: 'Good', desc: 'Minor signs of use' },
-                    { val: 'Certified Refurbished', label: 'Fair', desc: 'Tested & functioning' },
-                  ].map((c) => (
-                    <button
-                      key={c.val}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, condition: c.val })}
-                      className={`p-2 rounded-xl border text-left transition-all ${
-                        formData.condition === c.val
-                          ? 'border-[#007791] bg-cyan-50/60 ring-2 ring-[#007791]/20'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="font-bold text-slate-900 text-xs">{c.label}</div>
-                      <div className="text-[10px] text-slate-500">{c.desc}</div>
-                    </button>
-                  ))}
+              {/* Purchase Invoice Mandatory Section (Guide Section 11 & 16) */}
+              <div className="p-4 bg-sky-50 border-2 border-dashed border-sky-300 rounded-2xl space-y-2">
+                <div className="flex items-center space-x-2 text-sky-900 font-bold">
+                  <FileText className="w-4 h-4 text-sky-700" />
+                  <span>Mandatory Purchase Invoice (Prevents Fake / Unsafe Equipment)</span>
+                </div>
+                <p className="text-[11px] text-sky-800">
+                  As mandated in Section 11 & 16 of the Plain-English Guide, owners must provide the original purchase invoice to verify device authenticity before admin approves.
+                </p>
+                <div className="p-3 bg-white rounded-xl border border-sky-200 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span className="font-mono font-medium text-slate-800 text-[11px]">{formData.purchaseInvoiceName}</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded">
+                    Ready for Admin Review
+                  </span>
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Listing Title for Renters</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Description & Maintenance Condition</label>
+                <label className="block font-semibold text-slate-700 mb-1">Detailed Description & Sanitization Status</label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#007791]/30"
+                  className="w-full p-2.5 rounded-xl border border-slate-200"
                 />
               </div>
             </div>
           )}
 
-          {/* STEP 2: Proof Video */}
-          {step === 2 && (
-            <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-cyan-50/70 border border-cyan-200 flex items-start space-x-3">
-                <Video className="w-5 h-5 text-[#007791] flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-cyan-950">Why a 5-Second Proof Video is Required:</h4>
-                  <p className="text-cyan-800 text-[11px] mt-0.5 leading-relaxed">
-                    Recording a 5-second video showing the power switch turn on and LCD display light up protects your equipment and eliminates disputes before Porter collects it from your door.
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <h4 className="font-bold text-slate-800 text-sm">Working Proof Video Attached</h4>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  File: <code className="text-[#007791] font-semibold">proof_philips_5l_verified.mp4</code> (5.2 MB)
-                </p>
-                <div className="mt-3 inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  <ShieldCheck className="w-3.5 h-3.5 mr-0.5" />
-                  <span>Motor Hum & LCD Power Verified</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-slate-100 rounded-xl">
-                <label className="flex items-center space-x-2 text-slate-700 font-semibold cursor-pointer">
-                  <input type="checkbox" defaultChecked className="rounded text-[#007791]" />
-                  <span>I certify that this equipment has been sanitized with 70% alcohol solution</span>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Smart Pricing (NO UNPROFESSIONAL MARGINS) */}
+          {/* STEP 3: DAILY PRICING & DEPOSIT (GUIDE FORMULA) */}
           {step === 3 && (
-            <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 flex items-start space-x-3">
-                <Calculator className="w-5 h-5 text-[#007791] flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-slate-900">Recommended Rental Pricing</h4>
-                  <p className="text-slate-600 text-[11px] mt-0.5">
-                    We suggest competitive monthly rent and a secure refundable deposit based on retail price to ensure fast bookings and asset protection.
-                  </p>
-                </div>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                <h4 className="font-bold text-slate-900 text-xs">Pricing Rules from the Plain-English Guide (Page 8):</h4>
+                <p className="text-[11px] text-slate-600">
+                  You set the daily rate you want to earn and the refundable deposit.
+                  The marketplace adds 15% platform commission to create the final price shown to buyers.
+                </p>
               </div>
 
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">
-                  Original Purchase Price (₹):
-                </label>
-                <input
-                  type="number"
-                  value={formData.originalPrice}
-                  onChange={(e) => handleOriginalPriceChange(Number(e.target.value))}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-sm font-bold focus:ring-2 focus:ring-[#007791]/30"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Monthly Rent Charged (₹):</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-amber-50/60 border border-amber-200 rounded-2xl space-y-2">
+                  <label className="block font-bold text-amber-950">
+                    Your Desired Rent Per Day (₹):
+                  </label>
                   <input
                     type="number"
-                    value={formData.monthlyRent}
-                    onChange={(e) => setFormData({ ...formData, monthlyRent: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-sm font-bold text-[#007791]"
+                    min="50"
+                    max="5000"
+                    step="10"
+                    value={formData.ownerPricePerDay}
+                    onChange={(e) => setFormData({ ...formData, ownerPricePerDay: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-amber-300 font-mono text-base font-bold bg-white"
                   />
+                  <span className="text-[11px] text-amber-800 block">
+                    You receive 100% of this amount (₹{formData.ownerPricePerDay}/day) post-inspection.
+                  </span>
                 </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Refundable Security Deposit (₹):</label>
+
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                  <label className="block font-bold text-slate-800">
+                    Refundable Security Deposit (₹):
+                  </label>
                   <input
                     type="number"
+                    min="500"
+                    max="50000"
+                    step="500"
                     value={formData.securityDeposit}
                     onChange={(e) => setFormData({ ...formData, securityDeposit: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-sm font-bold text-emerald-700"
+                    className="w-full p-2.5 rounded-xl border border-slate-300 font-mono text-base font-bold bg-white"
                   />
+                  <span className="text-[11px] text-slate-500 block">
+                    Held in safe escrow; refunded to buyer after you verify returned unit.
+                  </span>
                 </div>
               </div>
 
-              {/* Clean Earnings Card */}
-              <div className="p-4 rounded-2xl bg-[#0B192C] text-white space-y-2">
-                <div className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
-                  Your Net Monthly Earnings:
+              {/* Real-time Transparency Card */}
+              <div className="p-4 bg-cyan-50 border border-cyan-200 rounded-2xl space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-800 block">
+                  Marketplace Pricing Preview
+                </span>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-600">Your Earning:</span>
+                  <span className="font-mono font-bold text-amber-700">₹{formData.ownerPricePerDay} / day</span>
                 </div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-2xl font-black text-white">
-                    ₹{netOwnerPayout.toLocaleString('en-IN')} / month
-                  </span>
-                  <span className="text-xs text-emerald-400 font-bold">Direct Bank Credit</span>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-600">Platform Commission (15%):</span>
+                  <span className="font-mono font-bold text-[#007791]">+ ₹{commissionDaily} / day</span>
                 </div>
-                <p className="text-[11px] text-slate-300">
-                  Paid automatically to your bank account every month. Includes doorstep Porter courier pickup from your home and complete deposit insurance.
+                <div className="pt-2 border-t border-cyan-200 flex justify-between items-center text-sm font-black text-slate-900">
+                  <span>Price Shown to Buyers:</span>
+                  <span className="font-mono text-[#007791]">₹{buyerDailyPrice} / day</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: REVIEW & SUBMIT (STATUS PENDING) */}
+          {step === 4 && (
+            <div className="space-y-4">
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-2">
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900 uppercase">
+                  Listing Status Will Be: PENDING APPROVAL
+                </span>
+                <h4 className="font-black text-slate-900 text-sm">
+                  Submitting to Admin Review Queue (Step 2 -&gt; Step 3)
+                </h4>
+                <p className="text-slate-600 text-[11px] max-w-md mx-auto">
+                  Once you submit, our medical compliance team checks your purchase invoice and condition photos. You will receive an SMS and email notification the moment it goes LIVE!
                 </p>
               </div>
-            </div>
-          )}
 
-          {/* STEP 4: Bank Account & Handover */}
-          {step === 4 && (
-            <div className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Owner Full Name</label>
-                  <input
-                    type="text"
-                    value={formData.ownerName}
-                    onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Contact Phone (Aadhaar Linked)</label>
-                  <input
-                    type="text"
-                    value={formData.ownerPhone}
-                    onChange={(e) => setFormData({ ...formData, ownerPhone: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">City</label>
-                  <input
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Locality / Address for Porter Pickup</label>
-                  <input
-                    type="text"
-                    value={formData.locality}
-                    onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200"
-                  />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-[#007791]" />
-                  <span>Bank Account for Direct Monthly Earnings</span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50 space-y-2 text-xs">
+                <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-slate-500 font-medium mb-1">Account Number</label>
-                    <input
-                      type="text"
-                      value={formData.bankAccount}
-                      onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
-                      className="w-full p-2 rounded-lg border border-slate-200 bg-white"
-                    />
+                    <span className="text-slate-400 text-[10px] block">Equipment:</span>
+                    <span className="font-bold text-slate-800">{formData.title}</span>
                   </div>
                   <div>
-                    <label className="block text-slate-500 font-medium mb-1">IFSC Code</label>
-                    <input
-                      type="text"
-                      value={formData.bankIfsc}
-                      onChange={(e) => setFormData({ ...formData, bankIfsc: e.target.value })}
-                      className="w-full p-2 rounded-lg border border-slate-200 bg-white"
-                    />
+                    <span className="text-slate-400 text-[10px] block">Owner:</span>
+                    <span className="font-bold text-slate-800">{formData.ownerName}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 text-[10px] block">Payout Bank:</span>
+                    <span className="font-mono font-bold text-slate-800">{formData.bankName} (IFSC: {formData.bankIfsc})</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 text-[10px] block">Daily Earning:</span>
+                    <span className="font-mono font-bold text-amber-700">₹{formData.ownerPricePerDay}/day</span>
                   </div>
                 </div>
               </div>
             </div>
           )}
+
         </div>
 
         {/* Footer Navigation */}
@@ -392,7 +434,7 @@ export default function ListingWizardModal({
           {step > 1 ? (
             <button
               onClick={handleBack}
-              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 flex items-center space-x-1.5 transition-colors"
+              className="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-700 hover:bg-slate-100 flex items-center space-x-1"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back</span>
@@ -404,7 +446,7 @@ export default function ListingWizardModal({
           {step < 4 ? (
             <button
               onClick={handleNext}
-              className="px-5 py-2.5 rounded-xl bg-[#007791] text-white font-bold text-xs hover:bg-[#005F73] flex items-center space-x-1.5 shadow-sm transition-all"
+              className="px-5 py-2 rounded-xl bg-[#007791] hover:bg-[#005f73] text-white font-bold text-xs shadow-xs flex items-center space-x-1.5"
             >
               <span>Continue</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -413,19 +455,23 @@ export default function ListingWizardModal({
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#007791] to-[#10B981] text-white font-bold text-xs hover:from-[#005F73] hover:to-[#059669] flex items-center space-x-1.5 shadow-md transition-all active:scale-[0.98] disabled:opacity-75"
+              className="px-6 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-md flex items-center space-x-2 disabled:opacity-50"
             >
               {submitting ? (
-                <span>Publishing to Marketplace...</span>
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Submitting to Admin Queue...</span>
+                </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-emerald-300" />
-                  <span>Publish Listing to Live Marketplace</span>
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Submit Listing (Status: PENDING)</span>
                 </>
               )}
             </button>
           )}
         </div>
+
       </div>
     </div>
   );
