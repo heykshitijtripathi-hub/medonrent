@@ -15,6 +15,7 @@ import LenderHubModal from '@/components/LenderHubModal';
 import EscrowSimulatorModal from '@/components/EscrowSimulatorModal';
 import DoctorEndorsements from '@/components/DoctorEndorsements';
 import FaqSection from '@/components/FaqSection';
+import ContactSection from '@/components/ContactSection';
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 import Footer from '@/components/Footer';
 import QueryModal from '@/components/QueryModal';
@@ -476,6 +477,9 @@ export default function HomePage() {
         {/* Frequently Asked Questions */}
         <FaqSection />
       </main>
+
+      {/* Contact & Query Form */}
+      <ContactSection />
 
 
 
