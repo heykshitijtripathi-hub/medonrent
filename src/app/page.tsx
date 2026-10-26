@@ -12,11 +12,8 @@ import CheckoutModal, { CompletedBooking } from '@/components/CheckoutModal';
 import MyRentalsModal from '@/components/MyRentalsModal';
 import ListingWizardModal from '@/components/ListingWizardModal';
 import LenderHubModal from '@/components/LenderHubModal';
-import PlainEnglishGuideModal from '@/components/PlainEnglishGuideModal';
 import EscrowSimulatorModal from '@/components/EscrowSimulatorModal';
-import PrescriptionUploadModal from '@/components/PrescriptionUploadModal';
 import DoctorEndorsements from '@/components/DoctorEndorsements';
-import HowItWorksSection from '@/components/HowItWorksSection';
 import FaqSection from '@/components/FaqSection';
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 import Footer from '@/components/Footer';
@@ -24,6 +21,7 @@ import QueryModal from '@/components/QueryModal';
 import GoogleAuthModal from '@/components/GoogleAuthModal';
 import QuickViewModal from '@/components/QuickViewModal';
 import CartDrawer from '@/components/CartDrawer';
+import PrescriptionUploadModal from '@/components/PrescriptionUploadModal';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider, useCart } from '@/context/CartContext';
 import { INITIAL_EQUIPMENT, EquipmentItem } from '@/data/initialEquipment';
@@ -121,7 +119,7 @@ export default function HomePage() {
   const [isMyRentalsOpen, setIsMyRentalsOpen] = useState<boolean>(false);
   const [isListingWizardOpen, setIsListingWizardOpen] = useState<boolean>(false);
   const [isOwnerHubOpen, setIsOwnerHubOpen] = useState<boolean>(false);
-  const [isPlainEnglishGuideOpen, setIsPlainEnglishGuideOpen] = useState<boolean>(false);
+  
   const [isEscrowSimulatorOpen, setIsEscrowSimulatorOpen] = useState<boolean>(false);
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState<boolean>(false);
   const [isQueryModalOpen, setIsQueryModalOpen] = useState<boolean>(false);
@@ -413,7 +411,7 @@ export default function HomePage() {
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenMyRentals={() => setIsMyRentalsOpen(true)}
         onOpenQuery={() => setIsQueryModalOpen(true)}
-        onOpenPlainEnglishGuide={() => setIsPlainEnglishGuideOpen(true)}
+
         activeBookingsCount={userBookings.filter((b) => b.orderStatus !== 'Completed').length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -425,7 +423,7 @@ export default function HomePage() {
         onOpenListingWizard={() => setIsListingWizardOpen(true)}
         onOpenEscrowSimulator={() => setIsEscrowSimulatorOpen(true)}
         onOpenPrescription={() => setIsPrescriptionModalOpen(true)}
-        onOpenPlainEnglishGuide={() => setIsPlainEnglishGuideOpen(true)}
+
         selectedCity={selectedCity}
       />
 
@@ -473,22 +471,13 @@ export default function HomePage() {
         <DoctorEndorsements />
 
         {/* How It Works & Trust Pillars (Guide Master Flow) */}
-        <HowItWorksSection onOpenGuide={() => setIsPlainEnglishGuideOpen(true)} />
+
 
         {/* Frequently Asked Questions */}
         <FaqSection />
       </main>
 
-      {/* Plain-English Guide Complete Interactive Modal */}
-      <PlainEnglishGuideModal
-        isOpen={isPlainEnglishGuideOpen}
-        onClose={() => setIsPlainEnglishGuideOpen(false)}
-        onOpenOwnerDashboard={() => setIsOwnerHubOpen(true)}
-        onOpenBuyerDashboard={() => setIsMyRentalsOpen(true)}
-        onOpenAdminDashboard={() => {
-          window.location.href = '/admin';
-        }}
-      />
+
 
       {/* Owner Hub (Lister Dashboard) */}
       <LenderHubModal

@@ -12,7 +12,6 @@ import {
   X,
   PlusCircle,
   ShoppingCart,
-  BookOpen,
   Building2,
   ShieldCheck,
   HelpCircle
@@ -27,7 +26,6 @@ interface NavbarProps {
   onOpenMyRentals: () => void;
   onOpenQuery: () => void;
   onOpenCart: () => void;
-  onOpenPlainEnglishGuide: () => void;
   activeBookingsCount: number;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -42,7 +40,6 @@ export default function Navbar({
   onOpenMyRentals,
   onOpenQuery,
   onOpenCart,
-  onOpenPlainEnglishGuide,
   activeBookingsCount,
   searchQuery,
   onSearchChange,
@@ -105,17 +102,7 @@ export default function Navbar({
         {/* Right: Desktop Links */}
         <div className="hidden md:flex items-center space-x-2.5 lg:space-x-3.5 shrink-0">
           
-          {/* Plain-English Guide Interactive Button */}
-          <button
-            onClick={onOpenPlainEnglishGuide}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-[#007791] border border-cyan-200 text-xs font-bold transition-all shadow-xs"
-          >
-            <BookOpen className="w-3.5 h-3.5 text-[#007791]" />
-            <span>Plain-English Guide</span>
-            <span className="text-[9px] bg-[#007791] text-white px-1.5 py-0.2 rounded-full font-black">
-              13 Steps
-            </span>
-          </button>
+
 
           {/* Owner Hub (Lister) */}
           <button
@@ -251,12 +238,6 @@ export default function Navbar({
         {/* Mobile Right Icons */}
         <div className="flex md:hidden items-center space-x-1.5">
           <button
-            onClick={onOpenPlainEnglishGuide}
-            className="p-1.5 rounded-xl bg-cyan-50 text-[#007791] text-[10px] font-bold border border-cyan-200"
-          >
-            Guide
-          </button>
-          <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
             className="p-2 rounded-xl text-slate-700 hover:bg-slate-100"
             aria-label="Search"
@@ -312,19 +293,6 @@ export default function Navbar({
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-3 shadow-xl w-full">
-          <button
-            onClick={() => {
-              onOpenPlainEnglishGuide();
-              setMobileMenuOpen(false);
-            }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-cyan-50 border border-cyan-200 text-xs font-bold text-[#007791]"
-          >
-            <div className="flex items-center space-x-2">
-              <BookOpen className="w-4 h-4 text-[#007791]" />
-              <span>Complete Plain-English Guide (13 Steps)</span>
-            </div>
-            <span>→</span>
-          </button>
 
           <button
             onClick={() => {
